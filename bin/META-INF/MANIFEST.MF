@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: com.javacodegeeks.desktopjava.swing.jframe.TestFrameExampl
+ e
+
