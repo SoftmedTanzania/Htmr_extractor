@@ -6,6 +6,7 @@ import com.healthmarketscience.jackcess.DatabaseBuilder;
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import main.com.softmed.ctc2extractor.Model.CTCPatient;
+import main.com.softmed.ctc2extractor.Model.CTCPatientsModel;
 import main.com.softmed.ctc2extractor.Model.PatientAppointment;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -37,10 +38,10 @@ public class Main {
     private static String CTC2DatabaseLocation;
     private static Database db;
     private static JTextArea log;
+    private static String regcode = "",discode = "",facility = "",healthcentre = "",centrecode = "", hfrCode = "";
 
     public static void main(String s[]) {
         Configuration configuration = null;
-
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
         } catch (Exception e) {
@@ -50,6 +51,7 @@ public class Main {
                 configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
             } catch (Exception e1) {
                 e1.printStackTrace();
+                log.append("\n\nError Encountered : "+e1.getMessage());
             }
         }
 
@@ -59,7 +61,6 @@ public class Main {
         JFrame frame = new JFrame("CTC Extractor tool");
 
         JPanel panel = new JPanel();
-//        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JMenuBar menuBar = new JMenuBar();
@@ -79,17 +80,29 @@ public class Main {
 
         try {
             CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
+            getFacilityConfig(CTC2DatabaseLocation);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         JLabel label2 = new JLabel("  Location of the CTC2 files:");
         label2.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if(CTC2DatabaseLocation==null){
+        if(CTC2DatabaseLocation==null || CTC2DatabaseLocation.equals("")){
             CTC2DatabaseLocation = "Please select the CTC Database location in settings";
         }
         JLabel label3 = new JLabel("  "+CTC2DatabaseLocation);
         label3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+
+        JLabel label4 = new JLabel();
+        if(hfrCode.equals("")){
+            label4.setText(" ");
+        }else{
+            label4.setText("  HFR Code =  "+hfrCode);
+        }
+
+        label4.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton button = new JButton();
         button.setText("Start Data Synchronization");
@@ -98,11 +111,13 @@ public class Main {
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // display/center the jdialog when the button is pressed
                 Runnable r = new Runnable() {
                     public void run() {
-                        if (CTC2DatabaseLocation != null)
+                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
                             ObtainDataFromCTC2(CTC2DatabaseLocation);
+                        else{
+                            log.append("\n\n Please select the correct CTC2 Database location");
+                        }
                     }
                 };
                 new Thread(r).start();
@@ -130,12 +145,13 @@ public class Main {
         panel.add(label);
         panel.add(label2);
         panel.add(label3);
+        panel.add(label4);
         panel.add(button);
         panel.add(scroll);
 
         frame.setJMenuBar(menuBar);
         frame.add(panel);
-        frame.setSize(410, 295);
+        frame.setSize(410, 310);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -155,10 +171,16 @@ public class Main {
                         createDefault(configurationFile, selectedFile.getAbsolutePath());
                     } catch (Exception e1) {
                         e1.printStackTrace();
+
+                        log.append("\n\nError Encountered : "+e1.getMessage());
                     }
                     loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
-                    label2.setText("CTC2 files -" + selectedFile.getAbsolutePath());
                     CTC2DatabaseLocation = selectedFile.getAbsolutePath();
+                    getFacilityConfig(CTC2DatabaseLocation);
+
+
+                    label3.setText("  " + CTC2DatabaseLocation);
+                    label4.setText("  HFR Code =  "+hfrCode);
                 }
             }
         });
@@ -193,33 +215,25 @@ public class Main {
             return cf;
         } catch (ConfigurationException e) {
             e.printStackTrace();
+            log.append("\n\nError Encountered : "+e.getMessage());
         }
         System.out.println("Cannot locate configuration: tried," + fileNames);
         // default to an empty configuration
         return null;
     }
 
-    public static void ObtainDataFromCTC2(String fileLocation) {
-        int numberOfPatientsWithUpcomingAppointments = 0;
-        int numberOfPatientsWithMissedAppointments = 0;
+    public static void getFacilityConfig(String fileLocation){
         try {
-            System.out.println("CTC DATABASE Location = " + fileLocation);
-            db = DatabaseBuilder.open(new File("/Users/ilakozejumanne/CTC2dataV8.mdb"));
+            db = DatabaseBuilder.open(new File(fileLocation));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String regcode = "";
-        String discode = "";
-        String facility = "";
-        String healthcentre = "";
-        String centrecode = "";
-
         Table table = null;
         try {
-            table = table = db.getTable("tblConfig");
+            table = db.getTable("tblConfig");
         } catch (IOException e) {
             e.printStackTrace();
+            log.append("\n\nError Encountered : "+e.getMessage());
         }
 
 
@@ -228,6 +242,7 @@ public class Main {
             discode = row.getInt("DistrictCode").toString();
             facility = row.getInt("FacilityCode").toString();
             healthcentre = row.getInt("HealthCentreCode").toString();
+            hfrCode = row.getString("HFRCode");
         }
 
         if (regcode.length() == 1) {
@@ -243,10 +258,31 @@ public class Main {
             healthcentre = "0" + healthcentre;
         }
 
+
+    }
+
+    public  static void ObtainDataFromCTC2(String fileLocation) {
+        int numberOfPatientsWithUpcomingAppointments = 0;
+        int numberOfPatientsWithMissedAppointments = 0;
+        try {
+            System.out.println("CTC DATABASE Location = " + fileLocation);
+            db = DatabaseBuilder.open(new File(fileLocation));
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.append("\n\nError Encountered : "+e.getMessage());
+        }
+
+        CTCPatientsModel ctcPatientsModel = new CTCPatientsModel();
+
         centrecode = regcode + "-" + discode + "-" + facility + "." + healthcentre;
         System.out.println("centrecode =  " + centrecode);
         log.setText("Clinic Centre CTC2 Code : " + centrecode);
-        log.append("\nObtaining patient appointments from CTC2 database");
+        log.append("\nDate : " + Calendar.getInstance().getTime().toString());
+        ctcPatientsModel.setFacilityCTC2Code(centrecode);
+        ctcPatientsModel.setHfrCode(hfrCode);
+
+
+        log.append("\n\n\nObtaining patient appointments from CTC2 database");
 
 
         Calendar calendar = Calendar.getInstance();
@@ -311,7 +347,7 @@ public class Main {
             System.out.println("");
 
             List<PatientAppointment> appointments = new ArrayList<>();
-            int missedAppointmentCount=0;
+            int missedAppointmentCount=0,upcomingAppointmentCount=0;
             for (Row row1 : tblAppointments) {
 
                 //Calculating the date of 1 month from now
@@ -329,13 +365,14 @@ public class Main {
                     appointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
                     appointment.setStatus(0);
                     appointments.add(appointment);
+                    upcomingAppointmentCount++;
                 }
 
 
                 //Calculating the date of the last 3 month from now
                 Date threeMonthsAgo = new Date();
                 Calendar c1 = Calendar.getInstance();
-                c1.add(Calendar.MONTH, -24);
+                c1.add(Calendar.MONTH, -3);
                 threeMonthsAgo = c1.getTime();
 
                 //Obtaining all missed patient appointments in the last 3 month
@@ -353,7 +390,7 @@ public class Main {
 
             }
 
-            if (appointments.size() > 0) {
+            if (upcomingAppointmentCount > 0) {
                 numberOfPatientsWithUpcomingAppointments++;
             }
 
@@ -365,8 +402,9 @@ public class Main {
             ctcPatients.add(ctcPatient);
         }
 
+        ctcPatientsModel.setCtcPatients(ctcPatients);
         Gson gson = new Gson();
-        String json = gson.toJson(ctcPatients);
+        String json = gson.toJson(ctcPatientsModel);
 
         HttpClient httpClient = new DefaultHttpClient();
 
