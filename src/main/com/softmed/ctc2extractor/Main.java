@@ -357,16 +357,20 @@ public class Main {
                 c.add(Calendar.MONTH, 1);
                 aMonthFromNow = c.getTime();
 
-                //Obtaining all patient upcoming appointments in the upcoming month
-                if (row1.getDate("DateOfAppointment").after(calendar.getTime()) &&
-                        row1.getDate("DateOfAppointment").before(aMonthFromNow) &&
-                        row1.getInt("Cancelled")==0 &&
-                        row1.getString("PatientID").equals(row.getString("PatientID"))) {
-                    PatientAppointment appointment = new PatientAppointment();
-                    appointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
-                    appointment.setStatus(0);
-                    appointments.add(appointment);
-                    upcomingAppointmentCount++;
+                try {
+                    //Obtaining all patient upcoming appointments in the upcoming month
+                    if (row1.getDate("DateOfAppointment").after(calendar.getTime()) &&
+                            row1.getDate("DateOfAppointment").before(aMonthFromNow) &&
+                            row1.getInt("Cancelled") == 0 &&
+                            row1.getString("PatientID").equals(row.getString("PatientID"))) {
+                        PatientAppointment appointment = new PatientAppointment();
+                        appointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
+                        appointment.setStatus(0);
+                        appointments.add(appointment);
+                        upcomingAppointmentCount++;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
 
 
@@ -376,17 +380,21 @@ public class Main {
                 c1.add(Calendar.MONTH, -3);
                 threeMonthsAgo = c1.getTime();
 
-                //Obtaining all missed patient appointments in the last 3 month
-                if (row1.getDate("DateOfAppointment").after(threeMonthsAgo) &&
-                        row1.getDate("DateOfAppointment").before(calendar.getTime()) &&
-                        row1.getDate("DateOfAppointmentGiven")==null &&
-                        row1.getInt("Cancelled")==0 &&
-                        row1.getString("PatientID").equals(row.getString("PatientID"))) {
-                    PatientAppointment missedAppointment = new PatientAppointment();
-                    missedAppointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
-                    missedAppointment.setStatus(-1);
-                    appointments.add(missedAppointment);
-                    missedAppointmentCount++;
+                try {
+                    //Obtaining all missed patient appointments in the last 3 month
+                    if (row1.getDate("DateOfAppointment").after(threeMonthsAgo) &&
+                            row1.getDate("DateOfAppointment").before(calendar.getTime()) &&
+                            row1.getDate("DateOfAppointmentGiven") == null &&
+                            row1.getInt("Cancelled") == 0 &&
+                            row1.getString("PatientID").equals(row.getString("PatientID"))) {
+                        PatientAppointment missedAppointment = new PatientAppointment();
+                        missedAppointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
+                        missedAppointment.setStatus(-1);
+                        appointments.add(missedAppointment);
+                        missedAppointmentCount++;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
 
             }
