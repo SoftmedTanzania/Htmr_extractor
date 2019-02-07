@@ -11,6 +11,7 @@ import main.com.softmed.ctc2extractor.Model.PatientAppointment;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -430,16 +431,17 @@ public class Main {
             request.addHeader("Authorization", "Basic " + Base64.encodeBase64String(encodedPassword));
 
             request.setEntity(params);
-//			HttpResponse response = httpClient.execute(request);
+			HttpResponse response = httpClient.execute(request);
 
-            // handle response here...
-//			System.out.println("Server response : "+response.getStatusLine());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            httpClient.getConnectionManager().shutdown();
+             //handle response here...
+			System.out.println("Server response : "+response.getStatusLine());
 
             log.append("\nData sent successfully");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log.append("\nError sending data");
+        } finally {
+            httpClient.getConnectionManager().shutdown();
         }
 
 
