@@ -7,17 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="65487e46-57bb-4451-a3bd-0e765e62fdca" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/Htmr_extractor_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JFrameExample.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$1$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$1$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/helper.properties.bak" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -65,8 +55,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="420" column="32" selection-start-line="420" selection-start-column="32" selection-end-line="420" selection-end-column="32" />
+            <state relative-caret-position="530">
+              <caret line="396" column="40" selection-start-line="396" selection-start-column="40" selection-end-line="396" selection-end-column="40" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -109,8 +99,8 @@
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java" />
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatient.java" />
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatientsModel.java" />
-        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" />
       </list>
     </option>
   </component>
@@ -209,7 +199,7 @@
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="htmr_extractor" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549549145816" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549550535348" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -263,12 +253,12 @@
       <workItem from="1549341487798" duration="10120000" />
       <workItem from="1549358699891" duration="1485000" />
       <workItem from="1549543512613" duration="1094000" />
-      <workItem from="1549548801509" duration="245000" />
+      <workItem from="1549548801509" duration="684000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15854000" />
+    <option name="totallyTimeSpent" value="16293000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
@@ -344,8 +334,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="420" column="32" selection-start-line="420" selection-start-column="32" selection-end-line="420" selection-end-column="32" />
+        <state relative-caret-position="530">
+          <caret line="396" column="40" selection-start-line="396" selection-start-column="40" selection-end-line="396" selection-end-column="40" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

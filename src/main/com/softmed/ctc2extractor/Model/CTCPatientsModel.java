@@ -3,16 +3,16 @@ package main.com.softmed.ctc2extractor.Model;
 import java.util.List;
 
 public class CTCPatientsModel {
-	private List<CTCPatient> ctcPatients;
+	private List<CTCPatient> ctcPatientsDTOS;
 	private String facilityCTC2Code;
 	private String hfrCode;
 
-	public List<CTCPatient> getCtcPatients() {
-		return ctcPatients;
+	public List<CTCPatient> getCtcPatientsDTOS() {
+		return ctcPatientsDTOS;
 	}
 
-	public void setCtcPatients(List<CTCPatient> ctcPatients) {
-		this.ctcPatients = ctcPatients;
+	public void setCtcPatientsDTOS(List<CTCPatient> ctcPatientsDTOS) {
+		this.ctcPatientsDTOS = ctcPatientsDTOS;
 	}
 
 	public String getFacilityCTC2Code() {
