@@ -411,7 +411,7 @@ public class Main {
             ctcPatients.add(ctcPatient);
         }
 
-        ctcPatientsModel.setCtcPatients(ctcPatients);
+        ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
         Gson gson = new Gson();
         String json = gson.toJson(ctcPatientsModel);
 
