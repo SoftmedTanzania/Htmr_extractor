@@ -306,7 +306,6 @@ public class Main {
         int count = 0;
         System.out.println("Patients Information");
         for (Row row : tblPatients) {
-            System.out.println("");
             CTCPatient ctcPatient = new CTCPatient();
 
             ctcPatient.setHealthFacilityCode(centrecode);
@@ -337,15 +336,10 @@ public class Main {
             } catch (Exception e) {
             }
 
-            count++;
-            log.append("\nObtained Patient = : " + row.getString("PatientID"));
 
             ctcPatient.setHivStatus(true);
 
-            System.out.println("*****************************************************************************");
-            System.out.println("PatientID = " + row.getString("PatientID"));
-            System.out.println("*****************************************************************************");
-            System.out.println("");
+
 
             List<PatientAppointment> appointments = new ArrayList<>();
             int missedAppointmentCount=0,upcomingAppointmentCount=0;
@@ -407,8 +401,17 @@ public class Main {
                 numberOfPatientsWithMissedAppointments++;
             }
 
-            ctcPatient.setPatientAppointments(appointments);
-            ctcPatients.add(ctcPatient);
+            if(upcomingAppointmentCount > 0 || missedAppointmentCount >0) {
+                ctcPatient.setPatientAppointments(appointments);
+                ctcPatients.add(ctcPatient);
+                count++;
+
+                log.append("\nObtained Patient = : " + row.getString("PatientID"));
+                System.out.println("*****************************************************************************");
+                System.out.println("PatientID = " + row.getString("PatientID"));
+                System.out.println("*****************************************************************************");
+                System.out.println("");
+            }
         }
 
         ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
