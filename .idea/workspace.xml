@@ -8,12 +8,8 @@
   <component name="ChangeListManager">
     <list default="true" id="65487e46-57bb-4451-a3bd-0e765e62fdca" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Configs.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Model/CTCPatient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Model/CTCPatientsModel.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Model/PatientAppointment.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Model/PatientAppointment.class" beforeDir="false" afterPath="$PROJECT_DIR$/classes/production/Htmr_extractor/main/com/softmed/ctc2extractor/Model/PatientAppointment.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,84 +18,20 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/Htmr_extractor$CTC2Extractor.ic" NAME="CTC2Extractor Coverage Results" MODIFIED="1553868373282" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Configs.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="43" column="30" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatientsModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="21" lean-forward="true" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="21" />
-              <folding>
-                <element signature="e#252#253#0" expanded="true" />
-                <element signature="e#281#282#0" expanded="true" />
-                <element signature="e#350#351#0" expanded="true" />
-                <element signature="e#395#396#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
-              <folding>
-                <element signature="e#522#523#0" expanded="true" />
-                <element signature="e#579#580#0" expanded="true" />
-                <element signature="e#624#625#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="580">
-              <caret line="378" column="59" selection-start-line="378" selection-start-column="42" selection-end-line="378" selection-end-column="59" />
+            <state relative-caret-position="252">
+              <caret line="360" column="53" lean-forward="true" selection-start-line="360" selection-start-column="53" selection-end-line="360" selection-end-column="53" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#12576#12618#0" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -121,6 +53,11 @@
       <find>label4</find>
       <find>multiline</find>
       <find>count</find>
+      <find>missedAppointmentCount</find>
+      <find>tblAppointments</find>
+      <find>ObtainDataFromCTC2</find>
+      <find>try</find>
+      <find>appointments</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -132,15 +69,17 @@
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatient.java" />
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatientsModel.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" />
-        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java" />
         <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp" />
+        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java" />
+        <option value="$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="x" value="95" />
+    <option name="y" value="23" />
     <option name="width" value="1680" />
-    <option name="height" value="1050" />
+    <option name="height" value="984" />
   </component>
   <component name="ProjectView">
     <navigator currentView="Scope" currentSubView="Scope 'Project Files'; set:Project Files; class com.intellij.psi.search.scope.ProjectFilesScope" proportions="" version="1">
@@ -223,37 +162,7 @@
             <path>
               <item name="Htmr_extractor" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="Htmr_extractor" type="2674bda8:ScopeViewTreeModel$GroupNode" />
-              <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="Htmr_extractor" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="Htmr_extractor" type="2674bda8:ScopeViewTreeModel$GroupNode" />
-              <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="main" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="Htmr_extractor" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="Htmr_extractor" type="2674bda8:ScopeViewTreeModel$GroupNode" />
-              <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="main" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="Htmr_extractor" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="Htmr_extractor" type="2674bda8:ScopeViewTreeModel$GroupNode" />
-              <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="main" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="softmed" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-            </path>
-            <path>
-              <item name="Htmr_extractor" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
-              <item name="Htmr_extractor" type="2674bda8:ScopeViewTreeModel$GroupNode" />
-              <item name="src" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="main" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="com" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="softmed" type="9f88c78c:ScopeViewTreeModel$FileNode" />
-              <item name="ctc2extractor" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+              <item name="lib" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -268,7 +177,7 @@
     <property name="GenerateAntBuildDialog.outputFileNameProperty" value="htmr_extractor" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1486545288501" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553872032499" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -336,17 +245,18 @@
       <workItem from="1552470082810" duration="170000" />
       <workItem from="1552539608442" duration="3000" />
       <workItem from="1553253806206" duration="294000" />
-      <workItem from="1553856465505" duration="243000" />
+      <workItem from="1553856465505" duration="9280000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23693000" />
+    <option name="totallyTimeSpent" value="32730000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14468865" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14468865" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -355,7 +265,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32959184" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.5469388" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -366,6 +276,7 @@
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.32959184" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.32959184" />
+      <window_info anchor="right" id="Coverage" side_tool="true" weight="0.32967034" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -380,11 +291,53 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java</url>
+          <line>517</line>
+          <properties />
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java</url>
+          <line>456</line>
+          <properties />
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Configs.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="370">
+          <caret line="43" column="30" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -401,21 +354,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/CTCPatient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Model/PatientAppointment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
+        <state relative-caret-position="345">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
           <folding>
+            <element signature="e#493#494#0" expanded="true" />
             <element signature="e#522#523#0" expanded="true" />
             <element signature="e#579#580#0" expanded="true" />
             <element signature="e#624#625#0" expanded="true" />
@@ -423,27 +367,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/jackcess-2.2.2.jar!/com/healthmarketscience/jackcess/Row.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="14" column="17" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="378" column="59" selection-start-line="378" selection-start-column="42" selection-end-line="378" selection-end-column="59" />
+        <state relative-caret-position="252">
+          <caret line="360" column="53" lean-forward="true" selection-start-line="360" selection-start-column="53" selection-end-line="360" selection-end-column="53" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#12576#12618#0" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Configs.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/softmed/ctc2extractor/Main.jnlp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="43" column="30" selection-start-line="43" selection-start-column="30" selection-end-line="43" selection-end-column="30" />
         </state>
       </provider>
     </entry>

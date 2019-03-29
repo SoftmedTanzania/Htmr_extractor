@@ -2,7 +2,7 @@ package main.com.softmed.ctc2extractor.Model;
 
 public class PatientAppointment {
 	private Long dateOfAppointment;
-	private Long appointmentType;
+	private int appointmentType;
 	private int status;
 
 	public Long getDateOfAppointment() {
@@ -21,11 +21,11 @@ public class PatientAppointment {
 		this.status = status;
 	}
 
-	public Long getAppointmentType() {
+	public int getAppointmentType() {
 		return appointmentType;
 	}
 
-	public void setAppointmentType(Long appointmentType) {
+	public void setAppointmentType(int appointmentType) {
 		this.appointmentType = appointmentType;
 	}
 }
