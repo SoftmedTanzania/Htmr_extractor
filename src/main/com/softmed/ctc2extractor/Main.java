@@ -16,7 +16,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
@@ -429,8 +428,8 @@ public class Main {
         System.out.println("Sending data to server");
         log.append("\n\nSending data to server");
 
-        String username = "username";
-        String password = "password";
+        String username = "admin";
+        String password = "Admin123";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 

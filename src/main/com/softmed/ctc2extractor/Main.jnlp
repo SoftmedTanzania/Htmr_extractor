@@ -38,12 +38,11 @@
   codebase="https://docs.oracle.com/javase/tutorialJWS/samples/uiswing/JWSFileChooserDemoProject"
   href="Main.jnlp">
   <information>
-    <title>JWSFileChooserDemo</title>
-    <vendor>The Java(tm) Tutorial</vendor>
+    <title>CTC2 LTFs Extractors</title>
+    <vendor>Softmed LTD</vendor>
     <homepage href="https://docs.oracle.com/javase/tutorial/uiswing/examples/components/index.html#JWSFileChooserDemo"/>
-    <description>JWSFileChooserDemo</description>
-    <description kind="short">A demo of how to use the file choosers supplied
-    by Java Web Start.</description>
+    <description>CTC2Extractor</description>
+    <description kind="short">A simple app that extracts data from the CTC2 database and synchronizes it with your server.</description>
     <offline-allowed/>
   </information>
   <resources>
