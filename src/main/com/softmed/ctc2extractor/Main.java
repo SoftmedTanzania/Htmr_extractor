@@ -1,10 +1,7 @@
 package main.com.softmed.ctc2extractor;
 
 import com.google.gson.Gson;
-import com.healthmarketscience.jackcess.Database;
-import com.healthmarketscience.jackcess.DatabaseBuilder;
-import com.healthmarketscience.jackcess.Row;
-import com.healthmarketscience.jackcess.Table;
+import com.healthmarketscience.jackcess.*;
 import main.com.softmed.ctc2extractor.Model.CTCPatient;
 import main.com.softmed.ctc2extractor.Model.CTCPatientsModel;
 import main.com.softmed.ctc2extractor.Model.PatientAppointment;
@@ -41,7 +38,7 @@ public class Main {
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
-    public static void main(String s[]) {
+    public static void main(String[] s) {
         Configuration configuration = null;
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
@@ -57,9 +54,6 @@ public class Main {
         }
         Calendar c = Calendar.getInstance();
 
-        //TODO remove the below code only used for testing purposes
-        c.add(Calendar.YEAR,-2);
-        //================================
 
         todaysDate = c.getTime();
 
@@ -357,39 +351,25 @@ public class Main {
 
 
             List<PatientAppointment> appointments = new ArrayList<>();
-            int missedAppointmentCount = 0, upcomingAppointmentCount = 0;
-            for (Row appointment : tblAppointments) {
+            int missedAppointmentCount = 0;
 
-                //Calculating the date of 1 month from now
-//                Date aMonthFromNow = new Date();
-//                Calendar c = Calendar.getInstance();
-//                c.add(Calendar.MONTH, 1);
-//                aMonthFromNow = c.getTime();
-//
-//                try {
-//                    //Obtaining all patient upcoming appointments in the upcoming month
-//                    if (row1.getDate("DateOfAppointment").after(calendar.getTime()) &&
-//                            row1.getDate("DateOfAppointment").before(aMonthFromNow) &&
-//                            row1.getInt("Cancelled") == 0 &&
-//                            row1.getString("PatientID").equals(row.getString("PatientID"))) {
-//                        PatientAppointment appointment = new PatientAppointment();
-//                        appointment.setDateOfAppointment(row1.getDate("DateOfAppointment").getTime());
-//                        appointment.setStatus(0);
-//                        appointments.add(appointment);
-//                        upcomingAppointmentCount++;
-//                    }
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
 
+            IndexCursor cursor = null;
+            try {
+                cursor = CursorBuilder.createCursor(tblAppointments.getIndex("PatientID"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            for (Row appointment : cursor.newEntryIterable(patient.getString("PatientID"))) {
+                if (patient.getString("PatientID").equals("11-05-0204-002338")) {
+                    //found
+                }
 
                 //Calculating the date of the last 3 month from now
-                Date _28DaysAgo,_56DaysAgo = new Date();
+                Date _28DaysAgo, _56DaysAgo = new Date();
                 Calendar c1 = Calendar.getInstance();
 
-                //TODO remove this line
-                c1.add(Calendar.YEAR,-2);
-                //================================
                 c1.add(Calendar.DATE, -28);
                 _28DaysAgo = c1.getTime();
 
@@ -400,26 +380,33 @@ public class Main {
                     //Obtaining all missed patient appointments in the last 28 days
                     if (appointment.getDate("DateOfAppointment").after(_56DaysAgo) &&
                             appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
-                            appointment.getInt("Cancelled") == 0 &&
-                            appointment.getString("PatientID").equals(patient.getString("PatientID"))) {
+                            appointment.getInt("Cancelled") == 0) {
                         boolean hasVisited = false;
-                        for (Row visit : tblVisits) {
+
+                        IndexCursor visitsCursor = null;
+                        try {
+                            visitsCursor = CursorBuilder.createCursor(tblVisits.getIndex("PatientID"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
                             try {
                                 Date visitDate = visit.getDate("VisitDate");
-                                if (visitDate.after(_28DaysAgo) &&
+                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appointment.getDate("DateOfAppointment"))) &&
                                         visitDate.before(todaysDate) &&
                                         visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
                                     hasVisited = true;
                                     break;
                                 }
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
                         hasVisited = hasVisited;
 
                         if (hasVisited) {
-                            missedAppointmentCount=0;
+                            missedAppointmentCount = 0;
                             break;
                         } else {
                             PatientAppointment missedAppointment = new PatientAppointment();
@@ -431,20 +418,26 @@ public class Main {
 
                             //checking if the mother is pregnant, i.e has pregnancies that their due dates are after today
                             if (ctcPatient.getGender().equalsIgnoreCase("female")) {
-                                for (Row pregnancy : tblPregnancies) {
-                                    try {
 
+                                IndexCursor pregnancyCursor = null;
+                                try {
+                                    pregnancyCursor = CursorBuilder.createCursor(tblPregnancies.getIndex("PatientID"));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                for (Row pregnancy : pregnancyCursor.newEntryIterable(patient.getString("PatientID"))) {
+                                    try {
                                         Date dateOfBirth = pregnancy.getDate("DateOfBirth");
-                                        if (pregnancy.getString("PatientID").equals(appointment.getString("PatientID"))
-                                                && dateOfBirth == null
-                                                && pregnancy.getDate("DueDate").after(Calendar.getInstance().getTime())
+                                        if (dateOfBirth == null
+                                                && pregnancy.getDate("DueDate").after(todaysDate)
                                         ) {
                                             //Pregnant mother found.
                                             System.out.println("Pregnant mother found = " + new Gson().toJson(ctcPatient));
                                             missedAppointment.setAppointmentType(2);
                                             break;
                                         }
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -461,15 +454,12 @@ public class Main {
 
             }
 
-            if (upcomingAppointmentCount > 0) {
-                numberOfPatientsWithUpcomingAppointments++;
-            }
 
             if (missedAppointmentCount > 0) {
                 numberOfPatientsWithMissedAppointments++;
             }
 
-            if (upcomingAppointmentCount > 0 || missedAppointmentCount > 0) {
+            if (missedAppointmentCount > 0) {
                 ctcPatient.setPatientAppointments(appointments);
                 ctcPatients.add(ctcPatient);
                 count++;
@@ -478,7 +468,7 @@ public class Main {
                 System.out.println("*****************************************************************************");
                 System.out.println("PatientID = " + patient.getString("PatientID"));
                 System.out.println("*****************************************************************************");
-                System.out.println("");
+                System.out.println();
             }
         }
 
@@ -510,10 +500,10 @@ public class Main {
             request.addHeader("Authorization", "Basic " + Base64.encodeBase64String(encodedPassword));
 
             request.setEntity(params);
-//            HttpResponse response = httpClient.execute(request);
+            HttpResponse response = httpClient.execute(request);
 
             //handle response here...
-//            System.out.println("Server response : " + response.getStatusLine());
+            System.out.println("Server response : " + response.getStatusLine());
 
             log.append("\nData sent successfully");
         } catch (Exception ex) {
