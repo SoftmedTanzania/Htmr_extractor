@@ -493,7 +493,7 @@ public class Main {
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-            HttpPost request = new HttpPost("http://45.56.90.103:8080/opensrp/save-ctc-patients");
+            HttpPost request = new HttpPost("http://23.92.25.157:8080/opensrp/save-ctc-patients");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
