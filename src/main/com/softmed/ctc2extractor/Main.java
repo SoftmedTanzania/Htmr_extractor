@@ -39,6 +39,17 @@ public class Main {
     private static Date todaysDate;
 
     public static void main(String[] s) {
+
+        int i=0;
+        try {
+            i = Integer.parseInt("2d3f9f64-d127-4489-bde3-0d469aa8c046");
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(i);
+        }
+
+
+
         Configuration configuration = null;
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
@@ -264,7 +275,6 @@ public class Main {
     }
 
     public static void ObtainDataFromCTC2(String fileLocation) {
-        int numberOfPatientsWithUpcomingAppointments = 0;
         int numberOfPatientsWithMissedAppointments = 0;
         try {
             System.out.println("CTC DATABASE Location = " + fileLocation);
@@ -393,7 +403,12 @@ public class Main {
                         for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
                             try {
                                 Date visitDate = visit.getDate("VisitDate");
-                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appointment.getDate("DateOfAppointment"))) &&
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(appointment.getDate("DateOfAppointment"));
+                                c.add(Calendar.DATE,-1);
+                                Date appDate = c.getTime();
+
+                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
                                         visitDate.before(todaysDate) &&
                                         visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
                                     hasVisited = true;
@@ -482,8 +497,7 @@ public class Main {
         System.out.println("Patients found = " + count);
 
         log.append("\n\nPatients found = : " + count);
-        log.append("\nPatients with upcoming appointments = : " + numberOfPatientsWithUpcomingAppointments);
-        log.append("\nPatients with missed appointments = : " + numberOfPatientsWithMissedAppointments);
+        log.append("\nPatients with LTFs  = : " + numberOfPatientsWithMissedAppointments);
         System.out.println("Sending data to server");
         log.append("\n\nSending data to server");
 
@@ -493,7 +507,8 @@ public class Main {
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-            HttpPost request = new HttpPost("http://23.92.25.157:8080/opensrp/save-ctc-patients");
+//            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
+            HttpPost request = new HttpPost("http://");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
