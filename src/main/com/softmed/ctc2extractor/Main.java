@@ -372,10 +372,6 @@ public class Main {
             }
 
             for (Row appointment : cursor.newEntryIterable(patient.getString("PatientID"))) {
-                if (patient.getString("PatientID").equals("11-05-0204-002338")) {
-                    //found
-                }
-
                 //Calculating the date of the last 3 month from now
                 Date _28DaysAgo, _56DaysAgo = new Date();
                 Calendar c1 = Calendar.getInstance();
@@ -403,12 +399,8 @@ public class Main {
                         for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
                             try {
                                 Date visitDate = visit.getDate("VisitDate");
-                                Calendar c = Calendar.getInstance();
-                                c.setTime(appointment.getDate("DateOfAppointment"));
-                                c.add(Calendar.DATE,-1);
-                                Date appDate = c.getTime();
 
-                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
+                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appointment.getDate("DateAppointmentGiven"))) &&
                                         visitDate.before(todaysDate) &&
                                         visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
                                     hasVisited = true;
@@ -507,7 +499,7 @@ public class Main {
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
+            HttpPost request = new HttpPost("http://");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
