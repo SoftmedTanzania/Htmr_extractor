@@ -39,17 +39,6 @@ public class Main {
     private static Date todaysDate;
 
     public static void main(String[] s) {
-
-        int i=0;
-        try {
-            i = Integer.parseInt("2d3f9f64-d127-4489-bde3-0d469aa8c046");
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println(i);
-        }
-
-
-
         Configuration configuration = null;
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
