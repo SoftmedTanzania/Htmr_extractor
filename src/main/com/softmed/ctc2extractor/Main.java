@@ -39,17 +39,6 @@ public class Main {
     private static Date todaysDate;
 
     public static void main(String[] s) {
-
-        int i=0;
-        try {
-            i = Integer.parseInt("2d3f9f64-d127-4489-bde3-0d469aa8c046");
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println(i);
-        }
-
-
-
         Configuration configuration = null;
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
@@ -501,14 +490,13 @@ public class Main {
         System.out.println("Sending data to server");
         log.append("\n\nSending data to server");
 
-        String username = "admin";
-        String password = "Admin123";
+        String username = "username";
+        String password = "password";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-//            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
-            HttpPost request = new HttpPost("http://");
+            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
