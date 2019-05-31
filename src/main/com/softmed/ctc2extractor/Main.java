@@ -293,6 +293,13 @@ public class Main {
             e.printStackTrace();
         }
 
+        Table tblStatus = null;
+        try {
+            tblStatus = db.getTable("tblStatus");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Table tblAppointments = null;
         try {
             tblAppointments = db.getTable("tblAppointments");
@@ -351,6 +358,14 @@ public class Main {
 
             List<PatientAppointment> appointments = new ArrayList<>();
             int missedAppointmentCount = 0;
+
+            IndexCursor statusCursor = null;
+            try {
+                statusCursor = CursorBuilder.createCursor(tblStatus.getIndex("PatientID"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
 
             IndexCursor cursor = null;
@@ -460,15 +475,26 @@ public class Main {
             }
 
             if (missedAppointmentCount > 0) {
-                ctcPatient.setPatientAppointments(appointments);
-                ctcPatients.add(ctcPatient);
-                count++;
+                String patientStatus = "";
+                for(Row statusRow:statusCursor.newEntryIterable(patient.getString("PatientID"))){
+                    patientStatus=statusRow.getString("Status");
+                    System.out.println("Status : "+patientStatus+" Date : "+statusRow.getDate("StatusDate").toString());
+                }
 
-                log.append("\nObtained Patient = : " + patient.getString("PatientID"));
-                System.out.println("*****************************************************************************");
-                System.out.println("PatientID = " + patient.getString("PatientID"));
-                System.out.println("*****************************************************************************");
-                System.out.println();
+                if (!patientStatus.contains("transferred") && !patientStatus.contains("died") && !patientStatus.contains("opted")) {
+                    ctcPatient.setPatientAppointments(appointments);
+                    ctcPatients.add(ctcPatient);
+                    count++;
+
+                    System.out.println("*****************************************************************************");
+                    System.out.println("PatientID = " + patient.getString("PatientID"));
+                    System.out.println("*****************************************************************************");
+
+                    log.append("\nObtained LTF Patient = : " + patient.getString("PatientID")+"  Status : "+patientStatus);
+                    System.out.println();
+                }
+
+
             }
         }
 
