@@ -388,8 +388,12 @@ public class Main {
                         for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
                             try {
                                 Date visitDate = visit.getDate("VisitDate");
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(appointment.getDate("DateOfAppointment"));
+                                c.add(Calendar.DATE,-1);
+                                Date appDate = c.getTime();
 
-                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appointment.getDate("DateAppointmentGiven"))) &&
+                                if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
                                         visitDate.before(todaysDate) &&
                                         visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
                                     hasVisited = true;
