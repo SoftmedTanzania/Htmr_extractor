@@ -30,3 +30,7 @@ hs_err_pid*
 helper.properties
 
 htmr_exctractor/.DS_Store
+target/generated-sources/
+target/maven-archiver/
+target/maven-status/
+target/my-app-1.0-SNAPSHOT.jar
