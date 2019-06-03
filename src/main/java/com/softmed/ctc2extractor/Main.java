@@ -389,7 +389,7 @@ public class Main {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (!appointment.getString("PatientID").equals(patient.getString("PatientID"))) {
+                if (appointment.getString("PatientID").equals("14-04-0102-000964")) {
                     System.out.println("PatientID not found in appointments");
                 }
 
@@ -490,8 +490,8 @@ public class Main {
 
 
             if (missedAppointmentCount > 0) {
-                String patientStatus = "";
 
+                Row statusRow = null;
                 while (true){
                     try {
                         if (!statusCursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID"))))
@@ -499,18 +499,26 @@ public class Main {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Row statusRow = null;
+
                     try {
-                        statusRow = statusCursor.getCurrentRow();
-                        patientStatus=statusRow.getString("Status");
-                        System.out.println("Status : "+patientStatus+" Date : "+statusRow.getDate("StatusDate").toString());
-                    } catch (IOException e) {
+                        if(statusRow==null) {
+                            statusRow = statusCursor.getCurrentRow();
+                        }
+                        else if(statusRow.getDate("StatusDate")==null){
+                            statusRow = statusCursor.getCurrentRow();
+                        }
+                        else if(statusRow.getDate("StatusDate").before(statusCursor.getCurrentRow().getDate("StatusDate")))
+                            statusRow = statusCursor.getCurrentRow();
+
+
+                        System.out.println("Status : "+statusRow.getString("Status")+" Date : "+statusRow.getDate("StatusDate").toString());
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                 }
 
-                if (!patientStatus.toLowerCase().contains("transferred") && !patientStatus.toLowerCase().contains("died") && !patientStatus.toLowerCase().contains("opted")) {
+                if (statusRow!=null && !statusRow.getString("Status").toLowerCase().contains("transferred") && !statusRow.getString("Status").toLowerCase().contains("died") && !statusRow.getString("Status").toLowerCase().contains("opted")) {
                     ctcPatient.setPatientAppointments(appointments);
                     ctcPatients.add(ctcPatient);
                     count++;
