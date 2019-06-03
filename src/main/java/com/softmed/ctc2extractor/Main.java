@@ -420,7 +420,6 @@ public class Main {
                                 Date visitDate = visit.getDate("VisitDate");
                                 Calendar c = Calendar.getInstance();
                                 c.setTime(appointment.getDate("DateAppointmentGiven"));
-                                c.add(Calendar.DATE,-1);
                                 Date appDate = c.getTime();
 
                                 if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
@@ -587,8 +586,10 @@ public class Main {
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
         data.put("1", new Object[] {"CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
 
-        for(int i=0;i<50;i++){
+        List<String> ctcNo = new ArrayList<>();
+        for(int i=0;i<ctcPatients.size();i++){
             CTCPatient ctcPatient = ctcPatients.get(i);
+            ctcNo.add(ctcPatient.getCtcNumber());
             data.put(String.valueOf((i+2)), new Object[] {
                     ctcPatient.getCtcNumber()
                     ,ctcPatient.getFirstName()+" "+ctcPatient.getMiddleName()+" "+ctcPatient.getSurname()
@@ -601,6 +602,7 @@ public class Main {
             });
         }
 
+        System.out.println(new Gson().toJson(ctcNo));
         //Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
         int rownum = 0;
