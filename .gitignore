@@ -13,7 +13,6 @@
 .mtj.tmp/
 
 # Package Files #
-lib/commons-logging-1.1.1.jar
 *.war
 *.nar
 *.ear
