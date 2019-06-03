@@ -7,10 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="htmr_exctractor" />
+        <module name="Htmr_extractor" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="htmr_exctractor" target="1.7" />
+      <module name="Htmr_extractor" target="1.7" />
+      <module name="my-app" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -485,7 +486,7 @@ public class Main {
                     System.out.println("PatientID = " + patient.getString("PatientID"));
                     System.out.println("*****************************************************************************");
 
-                    log.append("\nObtained LTF Patient = : " + patient.getString("PatientID")+"  Status : "+patientStatus);
+                    log.append("\nObtained LTF Patient = : " + patient.getString("PatientID"));
                     System.out.println();
                 }
 
@@ -526,7 +527,12 @@ public class Main {
             //handle response here...
             System.out.println("Server response : " + response.getStatusLine());
 
-            log.append("\nData sent successfully");
+
+
+            if(response.getStatusLine().getStatusCode()==200)
+                log.append("\nData sent successfully");
+            else if(response.getStatusLine().getStatusCode()==401)
+                log.append("\nError sending data to the server");
         } catch (Exception ex) {
             ex.printStackTrace();
             log.append("\nError sending data");
@@ -541,16 +547,16 @@ public class Main {
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         //Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet("Employee Data");
+        XSSFSheet sheet = workbook.createSheet("Extracted LTFs");
 
         //This data needs to be written (Object[])
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[] {"SN","CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
+        data.put("1", new Object[] {"CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
 
-        int i=1;
-        for(CTCPatient ctcPatient:ctcPatients){
-            data.put(i+"", new Object[] {i+""
-                    ,ctcPatient.getCtcNumber()
+        for(int i=0;i<50;i++){
+            CTCPatient ctcPatient = ctcPatients.get(i);
+            data.put(String.valueOf((i+2)), new Object[] {
+                    ctcPatient.getCtcNumber()
                     ,ctcPatient.getFirstName()+" "+ctcPatient.getMiddleName()+" "+ctcPatient.getSurname()
                     ,ctcPatient.getGender()
                     ,ctcPatient.getPhoneNumber()
@@ -580,11 +586,15 @@ public class Main {
         }
         try
         {
+            SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+            String dateString = format.format( Calendar.getInstance().getTime()   );
+
             //Write the workbook in file system
-            FileOutputStream out = new FileOutputStream(new File("howtodoinjava_demo.xlsx"));
+            FileOutputStream out = new FileOutputStream(new File("CTC2 Extracted LTF -  "+dateString+".xlsx"));
             workbook.write(out);
             out.close();
-            System.out.println("howtodoinjava_demo.xlsx written successfully on disk.");
+            System.out.println("ctc2Extractor.xlsx written successfully on disk.");
+            log.append("\n\nLTF Excel file generated successfully");
         }
         catch (Exception e)
         {
