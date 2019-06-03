@@ -2,6 +2,7 @@
 ### Java template
 # Compiled class file
 *.class
+*.xlsx
 
 # Log file
 *.log
@@ -27,4 +28,5 @@ hs_err_pid*
 
 .idea/workspace.xml
 helper.properties
+
 htmr_exctractor/.DS_Store
