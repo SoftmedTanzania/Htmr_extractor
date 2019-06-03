@@ -470,13 +470,48 @@ public class Main {
             }
 
             if (missedAppointmentCount > 0) {
-                String patientStatus = "";
-                for(Row statusRow:statusCursor.newEntryIterable(patient.getString("PatientID"))){
-                    patientStatus=statusRow.getString("Status");
-                    System.out.println("Status : "+patientStatus+" Date : "+statusRow.getDate("StatusDate").toString());
+                Row statusRow = null;
+                for(Row tempRow:statusCursor.newEntryIterable(patient.getString("PatientID"))){
+                    if(statusRow==null) {
+                        statusRow = tempRow;
+                    }
+                    else if(statusRow.getDate("StatusDate")==null){
+                        statusRow = tempRow;
+                    }
+                    else if(statusRow.getDate("StatusDate").before(tempRow.getDate("StatusDate")))
+                        statusRow = tempRow;
+
+
+                    System.out.println("Status : "+statusRow.getString("Status")+" Date : "+statusRow.getDate("StatusDate").toString());
                 }
 
-                if (!patientStatus.toLowerCase().contains("transferred") && !patientStatus.toLowerCase().contains("died") && !patientStatus.toLowerCase().contains("opted")) {
+
+                while (true){
+                    try {
+                        if (!statusCursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID"))))
+                            break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        if(statusRow==null) {
+                            statusRow = statusCursor.getCurrentRow();
+                        }
+                        else if(statusRow.getDate("StatusDate")==null){
+                            statusRow = statusCursor.getCurrentRow();
+                        }
+                        else if(statusRow.getDate("StatusDate").before(statusCursor.getCurrentRow().getDate("StatusDate")))
+                            statusRow = statusCursor.getCurrentRow();
+
+                        System.out.println("Status : "+statusRow.getString("Status")+" Date : "+statusRow.getDate("StatusDate").toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                if (!statusRow.getString("Status").toLowerCase().contains("transferred") && !statusRow.getString("Status").toLowerCase().contains("died") && !statusRow.getString("Status").toLowerCase().contains("opted")) {
                     ctcPatient.setPatientAppointments(appointments);
                     ctcPatients.add(ctcPatient);
                     count++;
@@ -552,7 +587,7 @@ public class Main {
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
         data.put("1", new Object[] {"CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
 
-        for(int i=0;i<50;i++){
+        for(int i=0;i<ctcPatients.size();i++){
             CTCPatient ctcPatient = ctcPatients.get(i);
             data.put(String.valueOf((i+2)), new Object[] {
                     ctcPatient.getCtcNumber()
