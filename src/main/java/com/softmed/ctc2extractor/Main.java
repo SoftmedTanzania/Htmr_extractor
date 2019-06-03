@@ -409,8 +409,7 @@ public class Main {
                         try {
                             Date visitDate = visit.getDate("VisitDate");
                             Calendar c = Calendar.getInstance();
-                            c.setTime(appointment.getDate("DateOfAppointment"));
-                            c.add(Calendar.DATE,-1);
+                            c.setTime(appointment.getDate("DateAppointmentGiven"));
                             Date appDate = c.getTime();
 
                             if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
