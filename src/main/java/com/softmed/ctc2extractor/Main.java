@@ -572,8 +572,8 @@ public class Main {
 
         ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
 
-        System.out.println("Patients found = " + count);
-        log.append("\n\nPatients with LTFs found = : " + count);
+        System.out.println("Patients found = " + ctcPatients.size());
+        log.append("\n\nPatients with LTFs found = : " + ctcPatients.size());
 
         generateExcel(ctcPatients);
         if(state.equalsIgnoreCase("sync")){
