@@ -566,8 +566,8 @@ public class Main {
         log.append("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
         HttpClient httpClient = new DefaultHttpClient();
-        String username = "username";
-        String password = "password";
+        String username = "admin";
+        String password = "Admin123";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
@@ -586,9 +586,9 @@ public class Main {
 
 
 
-            if(response.getStatusLine().getStatusCode()==200)
+            if(response.getStatusLine().getStatusCode()==201)
                 log.append("\nData sent successfully");
-            else if(response.getStatusLine().getStatusCode()==401)
+            else
                 log.append("\nError sending data to the server");
         } catch (Exception ex) {
             ex.printStackTrace();
