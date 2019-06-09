@@ -410,7 +410,7 @@ public class Main {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (appointment.getString("PatientID").equals("14-04-0102-000964")) {
+                if (appointment.getString("PatientID").equals("05-01-0103-003392")) {
                     System.out.println("PatientID not found in appointments");
                 }
 
@@ -420,6 +420,8 @@ public class Main {
 
                 c1.add(Calendar.DATE, -28);
                 _28DaysAgo = c1.getTime();
+
+                Date appointmentDate = appointment.getDate("DateOfAppointment");
 
 
                 try {
@@ -435,13 +437,23 @@ public class Main {
                             e.printStackTrace();
                         }
 
+                        Date appDate = null;
                         while (visitsCursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID")))) {
                             try {
                                 Row visit = visitsCursor.getCurrentRow();
                                 Date visitDate = visit.getDate("VisitDate");
                                 Calendar c = Calendar.getInstance();
-                                c.setTime(appointment.getDate("DateAppointmentGiven"));
-                                Date appDate = c.getTime();
+
+
+                                if(appointment.getDate("DateAppointmentGiven")==null){
+                                    c.setTime(appointment.getDate("DateOfAppointment"));
+                                    c.add(Calendar.DATE, -28);
+                                    appDate = c.getTime();
+                                }else {
+                                    c.setTime(appointment.getDate("DateAppointmentGiven"));
+                                    c.add(Calendar.DATE, 1);
+                                    appDate = c.getTime();
+                                }
 
                                 if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
                                         visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
