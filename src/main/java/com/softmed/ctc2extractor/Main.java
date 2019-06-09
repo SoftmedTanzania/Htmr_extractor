@@ -109,16 +109,15 @@ public class Main {
 
         label4.setAlignmentX(Component.LEFT_ALIGNMENT);
         JButton button = new JButton();
-        button.setText("Start Data Synchronization");
+        button.setText("Export to excel");
 
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Runnable r = new Runnable() {
                     public void run() {
                         if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
-                            ObtainDataFromCTC2(CTC2DatabaseLocation);
+                            ObtainDataFromCTC2(CTC2DatabaseLocation,"export");
                         else {
                             log.append("\n\n Please select the correct CTC2 Database location");
                         }
@@ -127,6 +126,27 @@ public class Main {
                 new Thread(r).start();
             }
         });
+
+
+        JButton button2 = new JButton();
+        button2.setText("Synchronize data");
+        button2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Runnable r = new Runnable() {
+                    public void run() {
+                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
+                            ObtainDataFromCTC2(CTC2DatabaseLocation,"sync");
+                        else {
+                            log.append("\n\n Please select the correct CTC2 Database location");
+                        }
+                    }
+                };
+                new Thread(r).start();
+            }
+        });
+
+
 
 
         log = new JTextArea(10, 10);
@@ -151,11 +171,12 @@ public class Main {
         panel.add(label3);
         panel.add(label4);
         panel.add(button);
+        panel.add(button2);
         panel.add(scroll);
 
         frame.setJMenuBar(menuBar);
         frame.add(panel);
-        frame.setSize(410, 310);
+        frame.setSize(410, 340);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -265,7 +286,7 @@ public class Main {
 
     }
 
-    public static void ObtainDataFromCTC2(String fileLocation) {
+    public static void ObtainDataFromCTC2(String fileLocation,String state) {
         int numberOfPatientsWithMissedAppointments = 0;
         try {
             System.out.println("CTC DATABASE Location = " + fileLocation);
@@ -536,23 +557,29 @@ public class Main {
 
         }
 
+
         ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
-        Gson gson = new Gson();
-        String json = gson.toJson(ctcPatientsModel);
 
-        HttpClient httpClient = new DefaultHttpClient();
-
-
+        System.out.println("Patients found = " + count);
         log.append("\n\nPatients with LTFs found = : " + count);
 
         generateExcel(ctcPatients);
+        if(state.equalsIgnoreCase("sync")){
+            syncData(ctcPatientsModel);
+        }
 
 
+
+
+    }
+
+    public static void syncData( CTCPatientsModel ctcPatientsModel){
         System.out.println("Sending data to server");
         log.append("\n\nSending data to server");
-
-        String username = "username";
-        String password = "password";
+        String json = new Gson().toJson(ctcPatientsModel);
+        HttpClient httpClient = new DefaultHttpClient();
+        String username = "admin";
+        String password = "Admin123";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
@@ -569,9 +596,11 @@ public class Main {
             //handle response here...
             System.out.println("Server response : " + response.getStatusLine());
 
-            if(response.getStatusLine().getStatusCode()==200)
+
+
+            if(response.getStatusLine().getStatusCode()==201)
                 log.append("\nData sent successfully");
-            else if(response.getStatusLine().getStatusCode()==401)
+            else
                 log.append("\nError sending data to the server");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -579,8 +608,6 @@ public class Main {
         } finally {
             httpClient.getConnectionManager().shutdown();
         }
-
-
     }
 
     public static void generateExcel(List<CTCPatient> ctcPatients){
