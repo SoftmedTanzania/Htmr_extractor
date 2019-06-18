@@ -414,12 +414,18 @@ public class Main {
                     System.out.println("PatientID not found in appointments");
                 }
 
-                //Calculating the date of the last 3 month from now
+                //Calculating the date of the last 28 days from now
                 Date _28DaysAgo = new Date();
                 Calendar c1 = Calendar.getInstance();
 
                 c1.add(Calendar.DATE, -28);
                 _28DaysAgo = c1.getTime();
+
+                //Calculating the date of the last 28 days from now
+                Date _1yearsAgo = new Date();
+                Calendar c1 = Calendar.getInstance();
+                c1.add(Calendar.YEAR, -1);
+                _1yearsAgo = c1.getTime();
 
                 Date appointmentDate = appointment.getDate("DateOfAppointment");
 
@@ -427,6 +433,7 @@ public class Main {
                 try {
                     //Obtaining all missed patient appointments in the last 28 days
                     if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
+                            appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
                             appointment.getInt("Cancelled") == 0) {
                         boolean hasVisited = false;
 
