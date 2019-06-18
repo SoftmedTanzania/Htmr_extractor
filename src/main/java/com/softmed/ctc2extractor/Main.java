@@ -411,9 +411,18 @@ public class Main {
             _28DaysAgo = c1.getTime();
 
 
+            //Calculating the date of the last 28 days from now
+            Date _1yearsAgo = new Date();
+            Calendar c1 = Calendar.getInstance();
+            c1.add(Calendar.YEAR, -1);
+            _1yearsAgo = c1.getTime();
+
+
+
             try {
                 //Obtaining all LTF appointments in the last 28 days
                 if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
                         appointment.getInt("Cancelled") == 0) {
                     boolean hasVisited = false;
 
