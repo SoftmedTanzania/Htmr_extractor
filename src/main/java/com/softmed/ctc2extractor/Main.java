@@ -423,7 +423,6 @@ public class Main {
 
                 //Calculating the date of the last 28 days from now
                 Date _1yearsAgo = new Date();
-                Calendar c1 = Calendar.getInstance();
                 c1.add(Calendar.YEAR, -1);
                 _1yearsAgo = c1.getTime();
 
