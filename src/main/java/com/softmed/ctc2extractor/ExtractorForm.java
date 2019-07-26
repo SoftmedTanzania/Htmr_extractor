@@ -7,4 +7,6 @@ public class ExtractorForm {
     public JLabel welcome_note;
     public JLabel locationLabel;
     public JLabel locationValue;
+    private JButton export_to_excel_btn;
+    private JButton synchronizaDataButton;
 }

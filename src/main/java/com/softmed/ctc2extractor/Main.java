@@ -178,11 +178,11 @@ public class Main {
         panel.add(scroll);
 
         frame.setJMenuBar(menuBar);
-        frame.add(panel);
+//        frame.add(panel);
 
 
 
-//        frame.setContentPane(myForm.contentPane);
+        frame.setContentPane(myForm.contentPane);
         frame.setSize(710, 340);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
