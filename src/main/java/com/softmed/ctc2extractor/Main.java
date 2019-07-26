@@ -183,7 +183,7 @@ public class Main {
 
 
         frame.setContentPane(myForm.contentPane);
-        frame.setSize(710, 340);
+        frame.setSize(650, 340);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
