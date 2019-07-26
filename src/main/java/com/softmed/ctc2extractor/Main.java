@@ -102,7 +102,7 @@ public class Main {
         final JLabel label3 = new JLabel("  " + CTC2DatabaseLocation);
         label3.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        myForm.locationValue.setText(CTC2DatabaseLocation);
+        myForm.locationValue.setText("<html>"+ CTC2DatabaseLocation +"</html>");
 
 
         final JLabel label4 = new JLabel();

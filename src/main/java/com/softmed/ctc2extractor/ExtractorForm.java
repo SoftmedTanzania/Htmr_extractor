@@ -11,4 +11,7 @@ public class ExtractorForm {
     public JLabel locationValue;
     private JDatePickerImpl JDatePickerImpl1;
     private JDatePickerImpl JDatePickerImpl2;
+    private JButton exportToExcelButton;
+    private JButton synchronizeDataButton;
+    private JTextArea log;
 }
