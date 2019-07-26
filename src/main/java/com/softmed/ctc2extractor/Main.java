@@ -42,6 +42,8 @@ public class Main {
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
+    private static ExtractorForm myForm;
+
     public static void main(String[] s) {
         Configuration configuration = null;
         try {
@@ -57,10 +59,9 @@ public class Main {
             }
         }
         Calendar c = Calendar.getInstance();
-
-
         todaysDate = c.getTime();
 
+        myForm = new ExtractorForm();
 
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -100,6 +101,8 @@ public class Main {
         }
         final JLabel label3 = new JLabel("  " + CTC2DatabaseLocation);
         label3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        myForm.locationValue.setText(" : "+CTC2DatabaseLocation);
 
 
         final JLabel label4 = new JLabel();
@@ -176,7 +179,11 @@ public class Main {
 
         frame.setJMenuBar(menuBar);
         frame.add(panel);
-        frame.setSize(410, 340);
+
+
+
+//        frame.setContentPane(myForm.contentPane);
+        frame.setSize(710, 340);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
