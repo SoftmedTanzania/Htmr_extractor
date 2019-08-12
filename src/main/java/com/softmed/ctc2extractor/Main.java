@@ -39,11 +39,15 @@ public class Main {
     private static String configurationFile = "helper.properties";
     private static String CTC2DatabaseLocation;
     private static Database db;
-    private static JTextArea log;
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
+    private static ExtractorForm myForm;
+
     public static void main(String[] s) {
+
+        myForm = new ExtractorForm();
+
         Configuration configuration = null;
         try {
             configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
@@ -54,7 +58,7 @@ public class Main {
                 configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
             } catch (Exception e1) {
                 e1.printStackTrace();
-                log.append("\n\nError Encountered : " + e1.getMessage());
+                myForm.log.append("\n\nError Encountered : " + e1.getMessage());
             }
         }
         Calendar c = Calendar.getInstance();
@@ -64,7 +68,6 @@ public class Main {
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
 
         final JFrame frame = new JFrame("CTC Extractor tool");
-
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -77,11 +80,6 @@ public class Main {
         menu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
         menuBar.add(menu);
 
-        JLabel label = new JLabel(" ");
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel label1 = new JLabel("  Welcome to the simple CTC data extractor tool!!");
-        label1.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         try {
             CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
@@ -90,14 +88,13 @@ public class Main {
             e.printStackTrace();
         }
 
-        final JLabel label2 = new JLabel("  Location of the CTC2 files:");
-        label2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
 
         if (CTC2DatabaseLocation == null || CTC2DatabaseLocation.equals("")) {
             CTC2DatabaseLocation = "Please select the CTC Database location in settings";
         }
-        final JLabel label3 = new JLabel("  " + CTC2DatabaseLocation);
-        label3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        myForm.locationValue.setText("<html>"+ CTC2DatabaseLocation +"</html>");
 
 
         final JLabel label4 = new JLabel();
@@ -108,37 +105,31 @@ public class Main {
         }
 
         label4.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JButton button = new JButton();
-        button.setText("Export to excel");
 
-        button.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Runnable r = new Runnable() {
-                    public void run() {
-                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
-                            ObtainDataFromCTC2(CTC2DatabaseLocation,"export");
-                        else {
-                            log.append("\n\n Please select the correct CTC2 Database location");
-                        }
-                    }
-                };
-                new Thread(r).start();
-            }
-        });
-
-
-        JButton button2 = new JButton();
-        button2.setText("Synchronize data");
-        button2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button2.addActionListener(new ActionListener() {
+        myForm.synchronizeDataButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Runnable r = new Runnable() {
                     public void run() {
                         if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
                             ObtainDataFromCTC2(CTC2DatabaseLocation,"sync");
                         else {
-                            log.append("\n\n Please select the correct CTC2 Database location");
+                            myForm.log.append("\n\n Please select the correct CTC2 Database location");
+                        }
+                    }
+                };
+                new Thread(r).start();
+            }
+        });
+
+
+        myForm.exportToExcelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Runnable r = new Runnable() {
+                    public void run() {
+                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
+                            ObtainDataFromCTC2(CTC2DatabaseLocation,"export");
+                        else {
+                            myForm.log.append("\n\n Please select the correct CTC2 Database location");
                         }
                     }
                 };
@@ -148,35 +139,20 @@ public class Main {
 
 
 
-
-        log = new JTextArea(10, 10);
-        log.setEditable(false);
-        log.setMargin(new Insets(10, 10, 10, 10));
-
-        DefaultCaret caret = (DefaultCaret) log.getCaret();
+        DefaultCaret caret = (DefaultCaret) myForm.log.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
-        final JScrollPane scroll = new JScrollPane(log);
-        java.awt.Dimension size = new java.awt.Dimension(400, 150);
-        scroll.setMaximumSize(size);
-        scroll.setMinimumSize(size);
-        scroll.setPreferredSize(size);
-        scroll.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-
-        panel.add(label1);
-        panel.add(label);
-        panel.add(label2);
-        panel.add(label3);
         panel.add(label4);
-        panel.add(button);
-        panel.add(button2);
-        panel.add(scroll);
 
         frame.setJMenuBar(menuBar);
-        frame.add(panel);
-        frame.setSize(410, 340);
+//        frame.add(panel);
+
+
+
+        frame.setContentPane(myForm.contentPane);
+        frame.setSize(650, 340);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -197,14 +173,14 @@ public class Main {
                     } catch (Exception e1) {
                         e1.printStackTrace();
 
-                        log.append("\n\nError Encountered : " + e1.getMessage());
+                        myForm.log.append("\n\nError Encountered : " + e1.getMessage());
                     }
                     loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
                     CTC2DatabaseLocation = selectedFile.getAbsolutePath();
                     getFacilityConfig(CTC2DatabaseLocation);
 
+                    myForm.locationValue.setText("<html>"+ CTC2DatabaseLocation +"</html>");
 
-                    label3.setText("  " + CTC2DatabaseLocation);
                     label4.setText("  HFR Code =  " + hfrCode);
                 }
             }
@@ -240,7 +216,7 @@ public class Main {
             return cf;
         } catch (ConfigurationException e) {
             e.printStackTrace();
-            log.append("\n\nError Encountered : " + e.getMessage());
+            myForm.log.append("\n\nError Encountered : " + e.getMessage());
         }
         System.out.println("Cannot locate configuration: tried," + fileNames);
         // default to an empty configuration
@@ -258,7 +234,7 @@ public class Main {
             table = db.getTable("tblConfig");
         } catch (IOException e) {
             e.printStackTrace();
-            log.append("\n\nError Encountered : " + e.getMessage());
+            myForm.log.append("\n\nError Encountered : " + e.getMessage());
         }
 
 
@@ -293,20 +269,20 @@ public class Main {
             db = DatabaseBuilder.open(new File(fileLocation));
         } catch (IOException e) {
             e.printStackTrace();
-            log.append("\n\nError Encountered : " + e.getMessage());
+            myForm.log.append("\n\nError Encountered : " + e.getMessage());
         }
 
         CTCPatientsModel ctcPatientsModel = new CTCPatientsModel();
 
         centrecode = regcode + "-" + discode + "-" + facility + "." + healthcentre;
         System.out.println("centrecode =  " + centrecode);
-        log.setText("Clinic Centre CTC2 Code : " + centrecode);
-        log.append("\nDate : " + Calendar.getInstance().getTime().toString());
+        myForm.log.setText("Clinic Centre CTC2 Code : " + centrecode);
+        myForm.log.append("\nDate : " + Calendar.getInstance().getTime().toString());
         ctcPatientsModel.setFacilityCTC2Code(centrecode);
         ctcPatientsModel.setHfrCode(hfrCode);
 
 
-        log.append("\n\n\nObtaining patient appointments from CTC2 database");
+        myForm.log.append("\n\n\nObtaining patient appointments from CTC2 database");
 
 
         Table tblPatients = null;
@@ -591,9 +567,10 @@ public class Main {
 
     }
 
+
     public static void syncData( CTCPatientsModel ctcPatientsModel){
         System.out.println("Sending data to server");
-        log.append("\n\nSending data to server");
+        myForm.log.append("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
         HttpClient httpClient = new DefaultHttpClient();
         String username = "admin";
@@ -617,18 +594,21 @@ public class Main {
 
 
             if(response.getStatusLine().getStatusCode()==201)
-                log.append("\nData sent successfully");
+                myForm.log.append("\nData sent successfully");
             else
-                log.append("\nError sending data to the server");
+                myForm.log.append("\nError sending data to the server");
         } catch (Exception ex) {
             ex.printStackTrace();
-            log.append("\nError sending data");
+            myForm.log.append("\nError sending data");
         } finally {
             httpClient.getConnectionManager().shutdown();
         }
     }
 
     public static void generateExcel(List<CTCPatient> ctcPatients){
+
+        System.out.println("Generating EXCEL export");
+        myForm.log.append("\n\nGenerating EXCEL export");
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -639,10 +619,8 @@ public class Main {
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
         data.put("1", new Object[] {"CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
 
-        List<String> ctcNo = new ArrayList<>();
         for(int i=0;i<ctcPatients.size();i++){
             CTCPatient ctcPatient = ctcPatients.get(i);
-            ctcNo.add(ctcPatient.getCtcNumber());
             data.put(String.valueOf((i+2)), new Object[] {
                     ctcPatient.getCtcNumber()
                     ,ctcPatient.getFirstName()+" "+ctcPatient.getMiddleName()+" "+ctcPatient.getSurname()
@@ -655,7 +633,6 @@ public class Main {
             });
         }
 
-        System.out.println(new Gson().toJson(ctcNo));
         //Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
         int rownum = 0;
@@ -683,7 +660,7 @@ public class Main {
             workbook.write(out);
             out.close();
             System.out.println("ctc2Extractor.xlsx written successfully on disk.");
-            log.append("\n\nLTF Excel file generated successfully");
+            myForm.log.append("\n\nLTF Excel file generated successfully");
         }
         catch (Exception e)
         {
