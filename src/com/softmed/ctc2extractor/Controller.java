@@ -5,6 +5,13 @@ import com.healthmarketscience.jackcess.*;
 import com.softmed.ctc2extractor.Model.CTCPatient;
 import com.softmed.ctc2extractor.Model.CTCPatientsModel;
 import com.softmed.ctc2extractor.Model.PatientAppointment;
+import javafx.application.Platform;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -20,20 +27,16 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
-public class Main {
-
+public class Controller implements Initializable {
     private static final String TAG_CTC2_FILE_LOCAITON = "CTC2FileLocation";
     private static String configurationFile = "helper.properties";
     private static String CTC2DatabaseLocation;
@@ -41,158 +44,11 @@ public class Main {
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
-    private static ExtractorForm myForm;
-
-    public static void main(String[] s) {
-
-        myForm = new ExtractorForm();
-
-        Configuration configuration = null;
-        try {
-            configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                createDefault(configurationFile, "");
-                configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                myForm.log.append("\n\nError Encountered : " + e1.getMessage());
-            }
-        }
-        Calendar c = Calendar.getInstance();
-        todaysDate = c.getTime();
-
-        final JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-
-        final JFrame frame = new JFrame("CTC Extractor tool");
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu;
-        JMenuItem menuItem;
-
-        menu = new JMenu("Settings");
-        menu.setMnemonic(KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription("The only menu in this program that has menu items");
-        menuBar.add(menu);
-
-
-        try {
-            CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
-            getFacilityConfig(CTC2DatabaseLocation);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-
-        if (CTC2DatabaseLocation == null || CTC2DatabaseLocation.equals("")) {
-            CTC2DatabaseLocation = "Please select the CTC Database location in settings";
-        }
-
-        myForm.locationValue.setText("<html>"+ CTC2DatabaseLocation +"</html>");
-
-
-        final JLabel label4 = new JLabel();
-        if (hfrCode.equals("")) {
-            label4.setText(" ");
-        } else {
-            label4.setText("  HFR Code =  " + hfrCode);
-        }
-
-        label4.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        myForm.synchronizeDataButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Runnable r = new Runnable() {
-                    public void run() {
-                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
-                            ObtainDataFromCTC2(CTC2DatabaseLocation,"sync");
-                        else {
-                            myForm.log.append("\n\n Please select the correct CTC2 Database location");
-                        }
-                    }
-                };
-                new Thread(r).start();
-            }
-        });
-
-
-        myForm.exportToExcelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Runnable r = new Runnable() {
-                    public void run() {
-                        if (CTC2DatabaseLocation != null && !hfrCode.equals(""))
-                            ObtainDataFromCTC2(CTC2DatabaseLocation,"export");
-                        else {
-                            myForm.log.append("\n\n Please select the correct CTC2 Database location");
-                        }
-                    }
-                };
-                new Thread(r).start();
-            }
-        });
-
-
-
-        DefaultCaret caret = (DefaultCaret) myForm.log.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-
-
-        panel.add(label4);
-
-        frame.setJMenuBar(menuBar);
-//        frame.add(panel);
-
-
-
-        frame.setContentPane(myForm.contentPane);
-        frame.setSize(650, 340);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-        menuItem = new JMenuItem(new AbstractAction("Set CTC Database Location") {
-            public void actionPerformed(ActionEvent e) {
-                // Button pressed logic goes here
-
-                int result = fileChooser.showOpenDialog(frame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    // user selects a file
-
-                    File selectedFile = fileChooser.getSelectedFile();
-                    System.out.println("Selected file: " + selectedFile.getAbsolutePath());
-
-                    try {
-                        createDefault(configurationFile, selectedFile.getAbsolutePath());
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
-
-                        myForm.log.append("\n\nError Encountered : " + e1.getMessage());
-                    }
-                    loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
-                    CTC2DatabaseLocation = selectedFile.getAbsolutePath();
-                    getFacilityConfig(CTC2DatabaseLocation);
-
-                    myForm.locationValue.setText("<html>"+ CTC2DatabaseLocation +"</html>");
-
-                    label4.setText("  HFR Code =  " + hfrCode);
-                }
-            }
-        });
-
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, ActionEvent.ALT_MASK));
-        menuItem.getAccessibleContext().setAccessibleDescription(
-                "This doesn't really do anything");
-        menu.add(menuItem);
-
-
-    }
+    public Button syncButton;
+    public Button exportToExcel;
+    public Label facilityName;
+    public Label HFRCode;
+    public TextArea log;
 
     public static void createDefault(String fileName, String sourceFile) throws Exception {
         File file = new File(fileName);
@@ -206,8 +62,76 @@ public class Main {
         config.save();
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Configuration configuration = null;
+        try {
+            configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                createDefault(configurationFile, "");
+                configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                log.appendText("\n\nError Encountered : " + e1.getMessage());
+            }
+        }
+        Calendar c = Calendar.getInstance();
+        todaysDate = c.getTime();
 
-    static Configuration loadFirst(String prefix, String fileNames) {
+        try {
+            CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
+            getFacilityConfig(CTC2DatabaseLocation);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        if (CTC2DatabaseLocation == null || CTC2DatabaseLocation.equals("")) {
+            CTC2DatabaseLocation = "Please select the CTC Database location in settings";
+        }
+
+        facilityName.setText("CTC2 File Location : " + CTC2DatabaseLocation);
+
+        final JLabel label4 = new JLabel();
+        if (hfrCode.equals("")) {
+            HFRCode.setText("Facility HFR Code : ");
+        } else {
+            HFRCode.setText("HFR Code :  " + hfrCode);
+        }
+
+        label4.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    }
+
+    public void ExportToExcel() {
+        Runnable r = new Runnable() {
+            public void run() {
+                if (CTC2DatabaseLocation != null && !hfrCode.equals("")) {
+                    ObtainDataFromCTC2(CTC2DatabaseLocation, "export");
+                } else {
+                    log.appendText("\n\n Please select the correct CTC2 Database location");
+                }
+            }
+        };
+        new Thread(r).start();
+    }
+
+    public void SyncData() {
+        Runnable r = new Runnable() {
+            public void run() {
+                if (CTC2DatabaseLocation != null && !hfrCode.equals("")) {
+                    ObtainDataFromCTC2(CTC2DatabaseLocation, "sync");
+                } else {
+                    log.appendText("\n\n Please select the correct CTC2 Database location");
+                }
+            }
+        };
+        new Thread(r).start();
+    }
+
+    Configuration loadFirst(String prefix, String fileNames) {
         try {
             Configuration cf = new PropertiesConfiguration(fileNames)
                     .interpolatedConfiguration();
@@ -215,14 +139,14 @@ public class Main {
             return cf;
         } catch (ConfigurationException e) {
             e.printStackTrace();
-            myForm.log.append("\n\nError Encountered : " + e.getMessage());
+            log.appendText("\n\nError Encountered : " + e.getMessage());
         }
         System.out.println("Cannot locate configuration: tried," + fileNames);
         // default to an empty configuration
         return null;
     }
 
-    public static void getFacilityConfig(String fileLocation) {
+    public void getFacilityConfig(String fileLocation) {
         try {
             db = DatabaseBuilder.open(new File(fileLocation));
         } catch (IOException e) {
@@ -233,7 +157,7 @@ public class Main {
             table = db.getTable("tblConfig");
         } catch (IOException e) {
             e.printStackTrace();
-            myForm.log.append("\n\nError Encountered : " + e.getMessage());
+            log.appendText("\n\nError Encountered : " + e.getMessage());
         }
 
 
@@ -261,27 +185,60 @@ public class Main {
 
     }
 
-    public static void ObtainDataFromCTC2(String fileLocation,String state) {
+    public void setLocation() {
+        // Button pressed logic goes here
+
+        FileChooser fileChooser = new FileChooser();
+
+        Stage primaryStage = new Stage();
+        primaryStage.setTitle("Pick CTC2 DB Location");
+
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+
+        System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+
+        try {
+            createDefault(configurationFile, selectedFile.getAbsolutePath());
+        } catch (Exception e1) {
+            e1.printStackTrace();
+
+            log.appendText("\n\nError Encountered : " + e1.getMessage());
+        }
+        loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
+        CTC2DatabaseLocation = selectedFile.getAbsolutePath();
+        getFacilityConfig(CTC2DatabaseLocation);
+        facilityName.setText("File Location :" + CTC2DatabaseLocation);
+
+        HFRCode.setText("Facility HFR Code  :  " + hfrCode);
+    }
+
+
+    public void ObtainDataFromCTC2(String fileLocation, String state) {
         int numberOfPatientsWithMissedAppointments = 0;
         try {
             System.out.println("CTC DATABASE Location = " + fileLocation);
             db = DatabaseBuilder.open(new File(fileLocation));
         } catch (IOException e) {
             e.printStackTrace();
-            myForm.log.append("\n\nError Encountered : " + e.getMessage());
+            log.appendText("\n\nError Encountered : " + e.getMessage());
         }
 
         CTCPatientsModel ctcPatientsModel = new CTCPatientsModel();
 
         centrecode = regcode + "-" + discode + "-" + facility + "." + healthcentre;
         System.out.println("centrecode =  " + centrecode);
-        myForm.log.setText("Clinic Centre CTC2 Code : " + centrecode);
-        myForm.log.append("\nDate : " + Calendar.getInstance().getTime().toString());
+
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                log.setText("Clinic Centre CTC2 Code : " + centrecode);
+                log.appendText("\nDate : " + Calendar.getInstance().getTime().toString());
+                log.appendText("\n\n\nObtaining patient appointments from CTC2 database");
+            }
+        });
+
+
         ctcPatientsModel.setFacilityCTC2Code(centrecode);
         ctcPatientsModel.setHfrCode(hfrCode);
-
-
-        myForm.log.append("\n\n\nObtaining patient appointments from CTC2 database");
 
 
         Table tblPatients = null;
@@ -321,10 +278,10 @@ public class Main {
 
 
         //Obtaining data
-        java.util.List<CTCPatient> ctcPatients = new ArrayList<CTCPatient>();
+        final java.util.List<CTCPatient> ctcPatients = new ArrayList<CTCPatient>();
         int count = 0;
         System.out.println("Patients Information");
-        for (Row patient : tblPatients) {
+        for (final Row patient : tblPatients) {
             CTCPatient ctcPatient = new CTCPatient();
             ctcPatient.setHealthFacilityCode(centrecode);
             try {
@@ -353,7 +310,6 @@ public class Main {
             }
             ctcPatient.setHivStatus(true);
 
-
             List<PatientAppointment> appointments = new ArrayList<PatientAppointment>();
             int missedAppointmentCount = 0;
 
@@ -363,8 +319,6 @@ public class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
 
             IndexCursor cursor = null;
             try {
@@ -391,7 +345,6 @@ public class Main {
             Calendar c2 = Calendar.getInstance();
             c2.add(Calendar.YEAR, -1);
             _1yearsAgo = c2.getTime();
-
 
 
             try {
@@ -425,7 +378,7 @@ public class Main {
                             e.printStackTrace();
                         }
                     }
-                    if(!hasVisited) {
+                    if (!hasVisited) {
                         PatientAppointment missedAppointment = new PatientAppointment();
                         missedAppointment.setDateOfAppointment(appointment.getDate("DateOfAppointment").getTime());
                         missedAppointment.setStatus(-1);
@@ -474,22 +427,20 @@ public class Main {
 
             if (missedAppointmentCount > 0) {
                 Row statusRow = null;
-                for(Row tempRow:statusCursor.newEntryIterable(patient.getString("PatientID"))){
-                    if(statusRow==null) {
+                for (Row tempRow : statusCursor.newEntryIterable(patient.getString("PatientID"))) {
+                    if (statusRow == null) {
                         statusRow = tempRow;
-                    }
-                    else if(statusRow.getDate("StatusDate")==null){
+                    } else if (statusRow.getDate("StatusDate") == null) {
                         statusRow = tempRow;
-                    }
-                    else if(statusRow.getDate("StatusDate").before(tempRow.getDate("StatusDate")))
+                    } else if (statusRow.getDate("StatusDate").before(tempRow.getDate("StatusDate")))
                         statusRow = tempRow;
 
 
-                    System.out.println("Status : "+statusRow.getString("Status")+" Date : "+statusRow.getDate("StatusDate").toString());
+                    System.out.println("Status : " + statusRow.getString("Status") + " Date : " + statusRow.getDate("StatusDate").toString());
                 }
 
 
-                while (true){
+                while (true) {
                     try {
                         if (!statusCursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID"))))
                             break;
@@ -498,16 +449,14 @@ public class Main {
                     }
 
                     try {
-                        if(statusRow==null) {
+                        if (statusRow == null) {
                             statusRow = statusCursor.getCurrentRow();
-                        }
-                        else if(statusRow.getDate("StatusDate")==null){
+                        } else if (statusRow.getDate("StatusDate") == null) {
                             statusRow = statusCursor.getCurrentRow();
-                        }
-                        else if(statusRow.getDate("StatusDate").before(statusCursor.getCurrentRow().getDate("StatusDate")))
+                        } else if (statusRow.getDate("StatusDate").before(statusCursor.getCurrentRow().getDate("StatusDate")))
                             statusRow = statusCursor.getCurrentRow();
 
-                        System.out.println("Status : "+statusRow.getString("Status")+" Date : "+statusRow.getDate("StatusDate").toString());
+                        System.out.println("Status : " + statusRow.getString("Status") + " Date : " + statusRow.getDate("StatusDate").toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -523,7 +472,11 @@ public class Main {
                     System.out.println("PatientID = " + patient.getString("PatientID"));
                     System.out.println("*****************************************************************************");
 
-                    myForm.log.append("\nObtained LTF Patient = : " + patient.getString("PatientID"));
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            log.appendText("\nObtained LTF Patient = : " + patient.getString("PatientID"));
+                        }
+                    });
                     System.out.println();
                 }
 
@@ -534,20 +487,22 @@ public class Main {
         ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
 
         System.out.println("Patients found = " + ctcPatients.size());
-        myForm.log.append("\n\nPatients with LTFs found = : " + ctcPatients.size());
+
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                log.appendText("\n\nPatients with LTFs found = : " + ctcPatients.size());
+            }
+        });
 
         generateExcel(ctcPatients);
-        if(state.equalsIgnoreCase("sync")){
+        if (state.equalsIgnoreCase("sync")) {
             syncData(ctcPatientsModel);
         }
-
-
-
     }
 
-    public static void syncData( CTCPatientsModel ctcPatientsModel){
+    public void syncData(CTCPatientsModel ctcPatientsModel) {
         System.out.println("Sending data to server");
-        myForm.log.append("\n\nSending data to server");
+        log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
         HttpClient httpClient = new DefaultHttpClient();
         String username = "admin";
@@ -569,23 +524,27 @@ public class Main {
             System.out.println("Server response : " + response.getStatusLine());
 
 
-
-            if(response.getStatusLine().getStatusCode()==201)
-                myForm.log.append("\nData sent successfully");
+            if (response.getStatusLine().getStatusCode() == 201)
+                log.appendText("\nData sent successfully");
             else
-                myForm.log.append("\nError sending data to the server");
+                log.appendText("\nError sending data to the server");
         } catch (Exception ex) {
             ex.printStackTrace();
-            myForm.log.append("\nError sending data");
+            log.appendText("\nError sending data");
         } finally {
             httpClient.getConnectionManager().shutdown();
         }
     }
 
-    public static void generateExcel(List<CTCPatient> ctcPatients){
+    public void generateExcel(List<CTCPatient> ctcPatients) {
+
+        Platform.runLater(new Runnable() {
+            @Override public void run() {
+                log.appendText("\n\nGenerating EXCEL export");
+            }
+        });
 
         System.out.println("Generating EXCEL export");
-        myForm.log.append("\n\nGenerating EXCEL export");
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -594,53 +553,54 @@ public class Main {
 
         //This data needs to be written (Object[])
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[] {"CTC-NUMBER", "NAME", "GENDER","PHONE NUMBER","VILLAGE","WARD","CARE TAKER NAME","CARE TAKER PHONE NUMBER"});
+        data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER"});
 
-        for(int i=0;i<ctcPatients.size();i++){
+        for (int i = 0; i < ctcPatients.size(); i++) {
             CTCPatient ctcPatient = ctcPatients.get(i);
-            data.put(String.valueOf((i+2)), new Object[] {
+            data.put(String.valueOf((i + 2)), new Object[]{
                     ctcPatient.getCtcNumber()
-                    ,ctcPatient.getFirstName()+" "+ctcPatient.getMiddleName()+" "+ctcPatient.getSurname()
-                    ,ctcPatient.getGender()
-                    ,ctcPatient.getPhoneNumber()
-                    ,ctcPatient.getVillage()
-                    ,ctcPatient.getWard()
-                    ,ctcPatient.getCareTakerName()
-                    ,ctcPatient.getCareTakerPhoneNumber()
+                    , ctcPatient.getFirstName() + " " + ctcPatient.getMiddleName() + " " + ctcPatient.getSurname()
+                    , ctcPatient.getGender()
+                    , ctcPatient.getPhoneNumber()
+                    , ctcPatient.getVillage()
+                    , ctcPatient.getWard()
+                    , ctcPatient.getCareTakerName()
+                    , ctcPatient.getCareTakerPhoneNumber()
             });
         }
 
         //Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
         int rownum = 0;
-        for (String key : keyset)
-        {
+        for (String key : keyset) {
             XSSFRow row = sheet.createRow(rownum++);
-            Object [] objArr = data.get(key);
+            Object[] objArr = data.get(key);
             int cellnum = 0;
-            for (Object obj : objArr)
-            {
+            for (Object obj : objArr) {
                 Cell cell = row.createCell(cellnum++);
-                if(obj instanceof String)
-                    cell.setCellValue((String)obj);
-                else if(obj instanceof Integer)
-                    cell.setCellValue((Integer)obj);
+                if (obj instanceof String)
+                    cell.setCellValue((String) obj);
+                else if (obj instanceof Integer)
+                    cell.setCellValue((Integer) obj);
             }
         }
-        try
-        {
+        try {
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-            String dateString = format.format( Calendar.getInstance().getTime()   );
+            String dateString = format.format(Calendar.getInstance().getTime());
 
             //Write the workbook in file system
-            FileOutputStream out = new FileOutputStream(new File("CTC2 Extracted LTF -  "+dateString+".xlsx"));
+            FileOutputStream out = new FileOutputStream(new File("CTC2 Extracted LTF -  " + dateString + ".xlsx"));
             workbook.write(out);
             out.close();
             System.out.println("ctc2Extractor.xlsx written successfully on disk.");
-            myForm.log.append("\n\nLTF Excel file generated successfully");
-        }
-        catch (Exception e)
-        {
+
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    log.appendText("\n\nLTF Excel file generated successfully");
+                }
+            });
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
