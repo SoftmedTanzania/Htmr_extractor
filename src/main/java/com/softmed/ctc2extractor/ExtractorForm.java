@@ -9,9 +9,9 @@ public class ExtractorForm {
     public JLabel welcome_note;
     public JLabel locationLabel;
     public JLabel locationValue;
-    private JDatePickerImpl JDatePickerImpl1;
-    private JDatePickerImpl JDatePickerImpl2;
-    private JButton exportToExcelButton;
-    private JButton synchronizeDataButton;
-    private JTextArea log;
+    public JDatePickerImpl JDatePickerImpl1;
+    public JDatePickerImpl JDatePickerImpl2;
+    public JButton exportToExcelButton;
+    public JButton synchronizeDataButton;
+    public JTextArea log;
 }

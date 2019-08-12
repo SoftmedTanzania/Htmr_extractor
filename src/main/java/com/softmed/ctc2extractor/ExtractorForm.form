@@ -137,7 +137,14 @@
         <children>
           <component id="e70e" class="javax.swing.JTextArea" binding="log">
             <constraints/>
-            <properties/>
+            <properties>
+              <background color="-46774"/>
+              <columns value="1000"/>
+              <lineWrap value="true"/>
+              <rows value="100"/>
+              <text value=""/>
+              <wrapStyleWord value="true"/>
+            </properties>
           </component>
         </children>
       </scrollpane>
