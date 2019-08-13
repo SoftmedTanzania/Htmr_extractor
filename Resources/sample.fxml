@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="469.0" maxWidth="470.0" minHeight="469.0" minWidth="470.0" prefHeight="469.0" prefWidth="470.0" scaleShape="false" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.softmed.ctc2extractor.Controller">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Settings">
+            <items>
+              <MenuItem fx:id="setCTC2DBLocation" mnemonicParsing="false" onAction="#setLocation" text="Pick CTC Database Location" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <buttons>
+            <Label text="Copyright Softmed Ltd 2019   ">
+               <font>
+                  <Font size="10.0" />
+               </font></Label>
+         </buttons>
+      </ButtonBar>
+   </bottom>
+   <center>
+      <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" style="-fx-padding: 8;" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="164.0" minWidth="10.0" prefWidth="67.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="173.0" minWidth="0.0" prefWidth="21.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="354.0" minWidth="10.0" prefWidth="133.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="249.0" minWidth="8.0" prefWidth="61.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="459.0" minWidth="10.0" prefWidth="170.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="107.0" minHeight="0.0" prefHeight="34.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="259.0" minHeight="9.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="435.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="435.0" minHeight="10.0" prefHeight="19.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="435.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="483.0" minHeight="10.0" prefHeight="51.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="483.0" minHeight="10.0" prefHeight="210.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label contentDisplay="CENTER" prefHeight="31.0" prefWidth="535.0" text="Welcome to the simple CTC data extractor" GridPane.columnSpan="2147483647">
+               <font>
+                  <Font name="Apple SD GothicNeo ExtraBold" size="24.0" />
+               </font></Label>
+            <Label fx:id="facilityName" prefHeight="17.0" prefWidth="440.0" text="Facility Name" GridPane.columnSpan="5" GridPane.rowIndex="2" />
+            <Label GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label fx:id="HFRCode" alignment="CENTER" contentDisplay="CENTER" text="Facility HFR Code" textAlignment="CENTER" GridPane.columnSpan="4" GridPane.rowIndex="1">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font></Label>
+            <Label text="Start Date" GridPane.rowIndex="4" />
+            <Label style="-fx-label-padding: 4;" text="EndDate" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <Line endX="100.0" startX="-100.0" GridPane.rowIndex="3" />
+            <ScrollPane prefHeight="200.0" prefWidth="52.0" GridPane.columnSpan="5" GridPane.rowIndex="6">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <TextArea fx:id="log" prefHeight="200.0" prefWidth="452.0" />
+                     </children></AnchorPane>
+              </content>
+            </ScrollPane>
+            <JFXButton fx:id="exportToExcel" mnemonicParsing="false" onAction="#ExportToExcel" style="-jfx-button-type: RAISED; -fx-background-color: #009688; -fx-text-fill: white; -fx-background-radius: 40;" text="Export To Excel" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <JFXButton fx:id="syncButton" mnemonicParsing="false" onAction="#SyncData" style="-jfx-button-type: RAISED; -fx-background-color: #009688; -fx-text-fill: white; -fx-background-radius: 40;" text="Synchronize with Server" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+            <JFXDatePicker fx:id="startDatePicker" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <JFXDatePicker fx:id="endDatePicker" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+         </children>
+      </GridPane>
+   </center>
+</BorderPane>
