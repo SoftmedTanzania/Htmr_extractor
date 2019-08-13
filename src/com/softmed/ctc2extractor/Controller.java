@@ -57,7 +57,7 @@ public class Controller implements Initializable {
     private Date startDate, endDate;
 
 
-    public static void createDefault(String fileName, String sourceFile) throws Exception {
+    private static void createDefault(String fileName, String sourceFile) throws Exception {
         File file = new File(fileName);
         if (file.exists()) {
             file.renameTo(new File(fileName + ".bak"));
@@ -244,8 +244,7 @@ public class Controller implements Initializable {
     }
 
 
-    public void ObtainDataFromCTC2(String fileLocation, String state) {
-        int numberOfPatientsWithMissedAppointments = 0;
+    private void ObtainDataFromCTC2(String fileLocation, String state) {
         try {
             System.out.println("CTC DATABASE Location = " + fileLocation);
             db = DatabaseBuilder.open(new File(fileLocation));
@@ -259,13 +258,10 @@ public class Controller implements Initializable {
         centrecode = regcode + "-" + discode + "-" + facility + "." + healthcentre;
         System.out.println("centrecode =  " + centrecode);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                log.setText("Clinic Centre CTC2 Code : " + centrecode);
-                log.appendText("\nDate : " + Calendar.getInstance().getTime().toString());
-                log.appendText("\n\n\nObtaining patient appointments from CTC2 database");
-            }
+        Platform.runLater(() -> {
+            log.setText("Clinic Centre CTC2 Code : " + centrecode);
+            log.appendText("\nDate : " + Calendar.getInstance().getTime().toString());
+            log.appendText("\n\n\nObtaining patient appointments from CTC2 database");
         });
 
 
@@ -310,8 +306,8 @@ public class Controller implements Initializable {
 
 
         //Obtaining data
-        final java.util.List<CTCPatient> ctcPatients = new ArrayList<CTCPatient>();
-        int count = 0;
+        final java.util.List<CTCPatient> ctcLTFPatients = new ArrayList<>();
+        final java.util.List<CTCPatient> ctcMissedAppointmentsPatients = new ArrayList<>();
         System.out.println("Patients Information");
         for (final Row patient : tblPatients) {
             CTCPatient ctcPatient = new CTCPatient();
@@ -342,8 +338,10 @@ public class Controller implements Initializable {
             }
             ctcPatient.setHivStatus(true);
 
-            List<PatientAppointment> appointments = new ArrayList<PatientAppointment>();
+            List<PatientAppointment> missedAppointments = new ArrayList<PatientAppointment>();
+            List<PatientAppointment> ltfAppointments = new ArrayList<PatientAppointment>();
             int missedAppointmentCount = 0;
+            int ltfAppointmentCount = 0;
 
             IndexCursor statusCursor = null;
             try {
@@ -387,7 +385,7 @@ public class Controller implements Initializable {
 
             try {
 
-                //Obtaining all LTF appointments in the last 28 days
+                //Obtaining all missed appointments in the last 3 days
                 if (appointment.getDate("DateOfAppointment").before(_3DaysAgo) &&
                         appointment.getDate("DateOfAppointment").after(_28DaysAgo) &&
                         appointment.getInt("Cancelled") == 0) {
@@ -397,7 +395,7 @@ public class Controller implements Initializable {
 
                         //status of 1 = missed Appointment
                         missedAppointment.setStatus(1);
-                        appointments.add(missedAppointment);
+                        missedAppointments.add(missedAppointment);
                         missedAppointmentCount++;
                     }
                 } else //Obtaining all LTF appointments in the last 28 days
@@ -405,27 +403,21 @@ public class Controller implements Initializable {
                             appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
                             appointment.getInt("Cancelled") == 0) {
                         boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
-                        ;
 
                         if (!hasVisited) {
-                            PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
-
+                            PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
                             //status of 2 = LTF
-                            missedAppointment.setStatus(2);
-                            appointments.add(missedAppointment);
-                            missedAppointmentCount++;
+                            ltfAppointment.setStatus(2);
+                            ltfAppointments.add(ltfAppointment);
+                            ltfAppointmentCount++;
                         }
                     }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            if (missedAppointmentCount > 0) {
-                numberOfPatientsWithMissedAppointments++;
-            }
-
-            if (missedAppointmentCount > 0) {
+            if (missedAppointmentCount > 0 || ltfAppointmentCount > 0) {
                 Row statusRow = null;
                 for (Row tempRow : statusCursor.newEntryIterable(patient.getString("PatientID"))) {
                     if (statusRow == null) {
@@ -463,40 +455,45 @@ public class Controller implements Initializable {
 
                 }
 
-                if (!statusRow.getString("Status").toLowerCase().contains("transferred") && !statusRow.getString("Status").toLowerCase().contains("died") && !statusRow.getString("Status").toLowerCase().contains("opted")) {
-                    ctcPatient.setPatientAppointments(appointments);
-                    ctcPatients.add(ctcPatient);
-                    count++;
+                if (statusRow != null && !statusRow.getString("Status").toLowerCase().contains("transferred") && !statusRow.getString("Status").toLowerCase().contains("died") && !statusRow.getString("Status").toLowerCase().contains("opted")) {
+                    if (missedAppointmentCount > 0) {
+                        ctcPatient.setPatientAppointments(missedAppointments);
+                        ctcMissedAppointmentsPatients.add(ctcPatient);
+                    } else if (ltfAppointmentCount > 0) {
+                        ctcPatient.setPatientAppointments(ltfAppointments);
+                        ctcLTFPatients.add(ctcPatient);
+                    }
 
                     System.out.println("*****************************************************************************");
                     System.out.println("PatientID = " + patient.getString("PatientID"));
                     System.out.println("*****************************************************************************");
 
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            log.appendText("\nObtained LTF Patient = : " + patient.getString("PatientID"));
-                        }
-                    });
-                    System.out.println();
+
+                    if (missedAppointmentCount > 0) {
+                        Platform.runLater(() -> log.appendText("\nObtained Missed Appointment Patient = : " + patient.getString("PatientID")));
+                    } else if (ltfAppointmentCount > 0) {
+                        Platform.runLater(() -> log.appendText("\nObtained LTF Patient = : " + patient.getString("PatientID")));
+                    }
                 }
 
 
             }
         }
 
-        ctcPatientsModel.setCtcPatientsDTOS(ctcPatients);
+        java.util.List<CTCPatient> missedAndLTFAppointmentsPatients = new ArrayList<>();
+        missedAndLTFAppointmentsPatients.addAll(ctcMissedAppointmentsPatients);
+        missedAndLTFAppointmentsPatients.addAll(ctcLTFPatients);
 
-        System.out.println("Patients found = " + ctcPatients.size());
+        ctcPatientsModel.setCtcPatientsDTOS(missedAndLTFAppointmentsPatients);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                log.appendText("\n\nPatients with LTFs found = : " + ctcPatients.size());
-            }
+        System.out.println("Patients found = " + missedAndLTFAppointmentsPatients.size());
+
+        Platform.runLater(() -> {
+            log.appendText("\n\nPatients with Missed Appointments found = : " + ctcMissedAppointmentsPatients.size());
+            log.appendText("\n\nPatients with LTFs found = : " + ctcLTFPatients.size());
         });
 
-        generateExcel(ctcPatients);
+        generateExcel(ctcMissedAppointmentsPatients,ctcLTFPatients);
         if (state.equalsIgnoreCase("sync")) {
             syncData(ctcPatientsModel);
         }
@@ -571,7 +568,7 @@ public class Controller implements Initializable {
         return missedAppointment;
     }
 
-    public void syncData(CTCPatientsModel ctcPatientsModel) {
+    private void syncData(CTCPatientsModel ctcPatientsModel) {
         System.out.println("Sending data to server");
         log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
@@ -607,55 +604,18 @@ public class Controller implements Initializable {
         }
     }
 
-    public void generateExcel(List<CTCPatient> ctcPatients) {
+    private void generateExcel(List<CTCPatient> missedAppointmentsCTCPatients,List<CTCPatient> ltfsCTCPatients) {
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                log.appendText("\n\nGenerating EXCEL export");
-            }
-        });
+        Platform.runLater(() -> log.appendText("\n\nGenerating EXCEL export"));
 
         System.out.println("Generating EXCEL export");
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        //Create a blank sheet
-        XSSFSheet sheet = workbook.createSheet("Extracted LTFs");
+        createSheet(workbook,ltfsCTCPatients,"Extracted LTFs");
+        createSheet(workbook,missedAppointmentsCTCPatients,"Patients with Missed Appointments");
 
-        //This data needs to be written (Object[])
-        Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER"});
 
-        for (int i = 0; i < ctcPatients.size(); i++) {
-            CTCPatient ctcPatient = ctcPatients.get(i);
-            data.put(String.valueOf((i + 2)), new Object[]{
-                    ctcPatient.getCtcNumber()
-                    , ctcPatient.getFirstName() + " " + ctcPatient.getMiddleName() + " " + ctcPatient.getSurname()
-                    , ctcPatient.getGender()
-                    , ctcPatient.getPhoneNumber()
-                    , ctcPatient.getVillage()
-                    , ctcPatient.getWard()
-                    , ctcPatient.getCareTakerName()
-                    , ctcPatient.getCareTakerPhoneNumber()
-            });
-        }
-
-        //Iterate over data and write to sheet
-        Set<String> keyset = data.keySet();
-        int rownum = 0;
-        for (String key : keyset) {
-            XSSFRow row = sheet.createRow(rownum++);
-            Object[] objArr = data.get(key);
-            int cellnum = 0;
-            for (Object obj : objArr) {
-                Cell cell = row.createCell(cellnum++);
-                if (obj instanceof String)
-                    cell.setCellValue((String) obj);
-                else if (obj instanceof Integer)
-                    cell.setCellValue((Integer) obj);
-            }
-        }
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
             String dateString = format.format(Calendar.getInstance().getTime());
@@ -666,15 +626,56 @@ public class Controller implements Initializable {
             out.close();
             System.out.println("ctc2Extractor.xlsx written successfully on disk.");
 
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    log.appendText("\n\nLTF Excel file generated successfully");
-                }
-            });
+            Platform.runLater(() -> log.appendText("\n\nLTF Excel file generated successfully"));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void createSheet(XSSFWorkbook workbook,List<CTCPatient> patients,String sheetName){
+
+        //Create a blank missed appointments sheet
+        XSSFSheet missedAppointmentsSheet = workbook.createSheet(sheetName);
+
+        //This data needs to be written (Object[])
+        Map<String, Object[]> data = new TreeMap<>();
+        data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER","APPOINTMENT DATE"});
+
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        for (int i = 0; i < patients.size(); i++) {
+            CTCPatient ctcPatient = patients.get(i);
+            data.put(String.valueOf((i + 2)), new Object[]{
+                    ctcPatient.getCtcNumber()
+                    , ctcPatient.getFirstName() + " " + ctcPatient.getMiddleName() + " " + ctcPatient.getSurname()
+                    , ctcPatient.getGender()
+                    , ctcPatient.getPhoneNumber()
+                    , ctcPatient.getVillage()
+                    , ctcPatient.getWard()
+                    , ctcPatient.getCareTakerName()
+                    , ctcPatient.getCareTakerPhoneNumber()
+                    , simpleDateFormat.format(new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment()))
+            });
+        }
+
+        //Iterate over data and write to sheet
+        Set<String> keyset = data.keySet();
+        int missedAppointmentRowNum = 0;
+        for (String key : keyset) {
+            XSSFRow row = missedAppointmentsSheet.createRow(missedAppointmentRowNum++);
+            Object[] objArr = data.get(key);
+            int cellnum = 0;
+            for (Object obj : objArr) {
+                Cell cell = row.createCell(cellnum++);
+                if (obj instanceof String)
+                    cell.setCellValue((String) obj);
+                else if (obj instanceof Integer)
+                    cell.setCellValue((Integer) obj);
+            }
+        }
+
     }
 }
