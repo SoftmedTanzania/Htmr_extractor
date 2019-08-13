@@ -36,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
@@ -55,7 +54,7 @@ public class Controller implements Initializable {
     public TextArea log;
     public JFXDatePicker startDatePicker;
     public JFXDatePicker endDatePicker;
-    private Date startDate,endDate;
+    private Date startDate, endDate;
 
 
     public static void createDefault(String fileName, String sourceFile) throws Exception {
@@ -118,21 +117,19 @@ public class Controller implements Initializable {
 
         // when datePicker is pressed
         startDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e)
-            {
+            public void handle(ActionEvent e) {
                 // get the date picker value
                 startDate = java.sql.Date.valueOf(startDatePicker.getValue());
-                System.out.println("Start Date = "+startDate.toString());
+                System.out.println("Start Date = " + startDate.toString());
             }
         });
 
         // when datePicker is pressed
         endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e)
-            {
+            public void handle(ActionEvent e) {
                 // get the date picker value
                 endDate = java.sql.Date.valueOf(endDatePicker.getValue());
-                System.out.println("End Date = "+endDate.toString());
+                System.out.println("End Date = " + endDate.toString());
             }
         });
 
@@ -263,7 +260,8 @@ public class Controller implements Initializable {
         System.out.println("centrecode =  " + centrecode);
 
         Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 log.setText("Clinic Centre CTC2 Code : " + centrecode);
                 log.appendText("\nDate : " + Calendar.getInstance().getTime().toString());
                 log.appendText("\n\n\nObtaining patient appointments from CTC2 database");
@@ -366,12 +364,19 @@ public class Controller implements Initializable {
                 appointment = app;
             }
 
-            //Calculating the date of the last 3 month from now
+            //Calculating the date of the last 28 days from now
             Date _28DaysAgo = new Date();
             Calendar c1 = Calendar.getInstance();
 
             c1.add(Calendar.DATE, -28);
             _28DaysAgo = c1.getTime();
+
+            //Calculating the date of the last 3 days from now
+            Date _3DaysAgo = new Date();
+            Calendar c3 = Calendar.getInstance();
+
+            c3.add(Calendar.DATE, -3);
+            _3DaysAgo = c3.getTime();
 
 
             //Calculating the date of the last 28 days from now
@@ -380,77 +385,38 @@ public class Controller implements Initializable {
             c2.add(Calendar.YEAR, -1);
             _1yearsAgo = c2.getTime();
 
-
             try {
+
                 //Obtaining all LTF appointments in the last 28 days
-                if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
-                        appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
+                if (appointment.getDate("DateOfAppointment").before(_3DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_28DaysAgo) &&
                         appointment.getInt("Cancelled") == 0) {
-                    boolean hasVisited = false;
-
-                    IndexCursor visitsCursor = null;
-                    try {
-                        visitsCursor = CursorBuilder.createCursor(tblVisits.getIndex("PatientID"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
-                        try {
-                            Date visitDate = visit.getDate("VisitDate");
-                            Calendar c = Calendar.getInstance();
-                            c.setTime(appointment.getDate("DateAppointmentGiven"));
-                            Date appDate = c.getTime();
-
-                            if ((visitDate.after(_28DaysAgo) || visitDate.after(appDate)) &&
-                                    visitDate.before(todaysDate) &&
-                                    visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
-                                hasVisited = true;
-                                break;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
                     if (!hasVisited) {
-                        PatientAppointment missedAppointment = new PatientAppointment();
-                        missedAppointment.setDateOfAppointment(appointment.getDate("DateOfAppointment").getTime());
-                        missedAppointment.setStatus(-1);
+                        PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
-                        //setting the appointment type to be CTC appointment by default and updating it if the patient is a PMTCT case
-                        missedAppointment.setAppointmentType(1);
-
-                        //checking if the mother is pregnant, i.e has pregnancies that their due dates are after today
-                        if (ctcPatient.getGender().equalsIgnoreCase("female")) {
-
-                            IndexCursor pregnancyCursor = null;
-                            try {
-                                pregnancyCursor = CursorBuilder.createCursor(tblPregnancies.getIndex("PatientID"));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            for (Row pregnancy : pregnancyCursor.newEntryIterable(patient.getString("PatientID"))) {
-                                try {
-                                    Date dateOfBirth = pregnancy.getDate("DateOfBirth");
-                                    if (dateOfBirth == null
-                                            && pregnancy.getDate("DueDate").after(todaysDate)
-                                    ) {
-                                        //Pregnant mother found.
-                                        System.out.println("Pregnant mother found = " + new Gson().toJson(ctcPatient));
-                                        missedAppointment.setAppointmentType(2);
-                                        break;
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
+                        //status of 1 = missed Appointment
+                        missedAppointment.setStatus(1);
                         appointments.add(missedAppointment);
                         missedAppointmentCount++;
                     }
-                }
+                } else //Obtaining all LTF appointments in the last 28 days
+                    if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
+                            appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
+                            appointment.getInt("Cancelled") == 0) {
+                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
+                        ;
+
+                        if (!hasVisited) {
+                            PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+
+
+                            //status of 2 = LTF
+                            missedAppointment.setStatus(2);
+                            appointments.add(missedAppointment);
+                            missedAppointmentCount++;
+                        }
+                    }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -507,7 +473,8 @@ public class Controller implements Initializable {
                     System.out.println("*****************************************************************************");
 
                     Platform.runLater(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             log.appendText("\nObtained LTF Patient = : " + patient.getString("PatientID"));
                         }
                     });
@@ -523,7 +490,8 @@ public class Controller implements Initializable {
         System.out.println("Patients found = " + ctcPatients.size());
 
         Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 log.appendText("\n\nPatients with LTFs found = : " + ctcPatients.size());
             }
         });
@@ -532,6 +500,75 @@ public class Controller implements Initializable {
         if (state.equalsIgnoreCase("sync")) {
             syncData(ctcPatientsModel);
         }
+    }
+
+    private boolean checkIfTheClientHasVisitedTheFacility(Row appointment, Row patient, Date visitAppointmentDate, Table tblVisits) {
+        boolean hasVisited = false;
+
+        IndexCursor visitsCursor = null;
+        try {
+            visitsCursor = CursorBuilder.createCursor(tblVisits.getIndex("PatientID"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
+            try {
+                Date visitDate = visit.getDate("VisitDate");
+                Calendar c = Calendar.getInstance();
+                c.setTime(appointment.getDate("DateAppointmentGiven"));
+                Date appDate = c.getTime();
+
+                if ((visitDate.after(visitAppointmentDate) || visitDate.after(appDate)) &&
+                        visitDate.before(todaysDate) &&
+                        visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
+                    hasVisited = true;
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return hasVisited;
+    }
+
+    private PatientAppointment createMissedAppointment(Row appointment, Row patient, CTCPatient ctcPatient, Table tblPregnancies) {
+        PatientAppointment missedAppointment = new PatientAppointment();
+        missedAppointment.setDateOfAppointment(appointment.getDate("DateOfAppointment").getTime());
+        missedAppointment.setStatus(-1);
+
+        //setting the appointment type to be CTC appointment by default and updating it if the patient is a PMTCT case
+        missedAppointment.setAppointmentType(1);
+
+        //checking if the mother is pregnant, i.e has pregnancies that their due dates are after today
+        if (ctcPatient.getGender().equalsIgnoreCase("female")) {
+
+            IndexCursor pregnancyCursor = null;
+            try {
+                pregnancyCursor = CursorBuilder.createCursor(tblPregnancies.getIndex("PatientID"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            for (Row pregnancy : pregnancyCursor.newEntryIterable(patient.getString("PatientID"))) {
+                try {
+                    Date dateOfBirth = pregnancy.getDate("DateOfBirth");
+                    if (dateOfBirth == null
+                            && pregnancy.getDate("DueDate").after(todaysDate)
+                    ) {
+                        //Pregnant mother found.
+                        System.out.println("Pregnant mother found = " + new Gson().toJson(ctcPatient));
+                        missedAppointment.setAppointmentType(2);
+                        break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return missedAppointment;
     }
 
     public void syncData(CTCPatientsModel ctcPatientsModel) {
@@ -573,7 +610,8 @@ public class Controller implements Initializable {
     public void generateExcel(List<CTCPatient> ctcPatients) {
 
         Platform.runLater(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 log.appendText("\n\nGenerating EXCEL export");
             }
         });
@@ -629,7 +667,8 @@ public class Controller implements Initializable {
             System.out.println("ctc2Extractor.xlsx written successfully on disk.");
 
             Platform.runLater(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     log.appendText("\n\nLTF Excel file generated successfully");
                 }
             });

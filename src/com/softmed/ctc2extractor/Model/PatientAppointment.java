@@ -3,6 +3,9 @@ package com.softmed.ctc2extractor.Model;
 public class PatientAppointment {
 	private Long dateOfAppointment;
 	private int appointmentType;
+
+	//status of 1 = missed Appointment
+	//status of 2 = LTF
 	private int status;
 
 	public Long getDateOfAppointment() {
