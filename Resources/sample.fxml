@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDatePicker?>
 <?import javafx.scene.control.ButtonBar?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -75,10 +75,6 @@
                </font></Label>
             <Label text="Start Date" GridPane.rowIndex="4" />
             <Label style="-fx-label-padding: 4;" text="EndDate" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-            <DatePicker prefHeight="27.0" prefWidth="140.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-            <DatePicker GridPane.columnIndex="4" GridPane.rowIndex="4" />
-            <Button fx:id="exportToExcel" mnemonicParsing="false" onAction="#ExportToExcel" prefHeight="27.0" prefWidth="118.0" text="Export To Excel" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-            <Button fx:id="syncButton" mnemonicParsing="false" onAction="#SyncData" prefHeight="27.0" prefWidth="148.0" style="-fx-padding-left: 10;" text="Synchronize Data" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="5" />
             <Line endX="100.0" startX="-100.0" GridPane.rowIndex="3" />
             <ScrollPane prefHeight="200.0" prefWidth="52.0" GridPane.columnSpan="5" GridPane.rowIndex="6">
               <content>
@@ -88,6 +84,10 @@
                      </children></AnchorPane>
               </content>
             </ScrollPane>
+            <JFXButton fx:id="exportToExcel" mnemonicParsing="false" onAction="#ExportToExcel" style="-jfx-button-type: RAISED; -fx-background-color: blue; -fx-text-fill: white;" text="Export To Excel" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <JFXButton fx:id="syncButton" mnemonicParsing="false" onAction="#SyncData" style="-jfx-button-type: RAISED; -fx-background-color: blue; -fx-text-fill: white;" text="Synchronize with Server" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+            <JFXDatePicker GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <JFXDatePicker GridPane.columnIndex="4" GridPane.rowIndex="4" />
          </children>
       </GridPane>
    </center>

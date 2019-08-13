@@ -11,13 +11,18 @@
 
 
     <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <src.dir>src/</src.dir>
     </properties>
 
     <build>
         <sourceDirectory>${src.dir}</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>Resources/</directory>
+            </resource>
+        </resources>
     </build>
 
     <dependencies>
@@ -79,12 +84,6 @@
             <groupId>com.jfoenix</groupId>
             <artifactId>jfoenix</artifactId>
             <version>8.0.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jfoenix</groupId>
-            <artifactId>jfoenix</artifactId>
-            <version>9.0.8</version>
         </dependency>
 
 
