@@ -2,10 +2,13 @@ package com.softmed.ctc2extractor;
 
 import com.google.gson.Gson;
 import com.healthmarketscience.jackcess.*;
+import com.jfoenix.controls.JFXDatePicker;
 import com.softmed.ctc2extractor.Model.CTCPatient;
 import com.softmed.ctc2extractor.Model.CTCPatientsModel;
 import com.softmed.ctc2extractor.Model.PatientAppointment;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
@@ -49,6 +53,10 @@ public class Controller implements Initializable {
     public Label facilityName;
     public Label HFRCode;
     public TextArea log;
+    public JFXDatePicker startDatePicker;
+    public JFXDatePicker endDatePicker;
+    private Date startDate,endDate;
+
 
     public static void createDefault(String fileName, String sourceFile) throws Exception {
         File file = new File(fileName);
@@ -102,6 +110,32 @@ public class Controller implements Initializable {
         }
 
         label4.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+
+        // show week numbers
+        startDatePicker.setShowWeekNumbers(true);
+        endDatePicker.setShowWeekNumbers(true);
+
+        // when datePicker is pressed
+        startDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                // get the date picker value
+                startDate = java.sql.Date.valueOf(startDatePicker.getValue());
+                System.out.println("Start Date = "+startDate.toString());
+            }
+        });
+
+        // when datePicker is pressed
+        endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                // get the date picker value
+                endDate = java.sql.Date.valueOf(endDatePicker.getValue());
+                System.out.println("End Date = "+endDate.toString());
+            }
+        });
+
 
     }
 

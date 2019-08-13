@@ -86,8 +86,8 @@
             </ScrollPane>
             <JFXButton fx:id="exportToExcel" mnemonicParsing="false" onAction="#ExportToExcel" style="-jfx-button-type: RAISED; -fx-background-color: #009688; -fx-text-fill: white; -fx-background-radius: 40;" text="Export To Excel" GridPane.columnIndex="2" GridPane.rowIndex="5" />
             <JFXButton fx:id="syncButton" mnemonicParsing="false" onAction="#SyncData" style="-jfx-button-type: RAISED; -fx-background-color: #009688; -fx-text-fill: white; -fx-background-radius: 40;" text="Synchronize with Server" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-            <JFXDatePicker GridPane.columnIndex="2" GridPane.rowIndex="4" />
-            <JFXDatePicker GridPane.columnIndex="4" GridPane.rowIndex="4" />
+            <JFXDatePicker fx:id="startDatePicker" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <JFXDatePicker fx:id="endDatePicker" GridPane.columnIndex="4" GridPane.rowIndex="4" />
          </children>
       </GridPane>
    </center>
