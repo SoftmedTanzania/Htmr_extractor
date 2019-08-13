@@ -470,9 +470,9 @@ public class Controller implements Initializable {
 
 
                     if (missedAppointmentCount > 0) {
-                        Platform.runLater(() -> log.appendText("\nObtained Missed Appointment Patient = : " + patient.getString("PatientID")));
+                        Platform.runLater(() -> log.appendText("\nChecking Missed Appointment Patient = : " + patient.getString("PatientID")));
                     } else if (ltfAppointmentCount > 0) {
-                        Platform.runLater(() -> log.appendText("\nObtained LTF Patient = : " + patient.getString("PatientID")));
+                        Platform.runLater(() -> log.appendText("\nChecking LTF Patient = : " + patient.getString("PatientID")));
                     }
                 }
 
@@ -487,11 +487,6 @@ public class Controller implements Initializable {
         ctcPatientsModel.setCtcPatientsDTOS(missedAndLTFAppointmentsPatients);
 
         System.out.println("Patients found = " + missedAndLTFAppointmentsPatients.size());
-
-        Platform.runLater(() -> {
-            log.appendText("\n\nPatients with Missed Appointments found = : " + ctcMissedAppointmentsPatients.size());
-            log.appendText("\n\nPatients with LTFs found = : " + ctcLTFPatients.size());
-        });
 
         generateExcel(ctcMissedAppointmentsPatients,ctcLTFPatients);
         if (state.equalsIgnoreCase("sync")) {
@@ -612,8 +607,8 @@ public class Controller implements Initializable {
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        createSheet(workbook,ltfsCTCPatients,"Extracted LTFs");
-        createSheet(workbook,missedAppointmentsCTCPatients,"Patients with Missed Appointments");
+        createSheet(workbook,ltfsCTCPatients,"Extracted LTFs",true);
+        createSheet(workbook,missedAppointmentsCTCPatients,"Patients with Missed Appointments",false);
 
 
         try {
@@ -634,7 +629,7 @@ public class Controller implements Initializable {
     }
 
 
-    private void createSheet(XSSFWorkbook workbook,List<CTCPatient> patients,String sheetName){
+    private void createSheet(XSSFWorkbook workbook,List<CTCPatient> patients,String sheetName, boolean isLTF){
 
         //Create a blank missed appointments sheet
         XSSFSheet missedAppointmentsSheet = workbook.createSheet(sheetName);
@@ -643,23 +638,52 @@ public class Controller implements Initializable {
         Map<String, Object[]> data = new TreeMap<>();
         data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER","APPOINTMENT DATE"});
 
-        String pattern = "dd-MM-yyyy";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        Calendar c1 = Calendar.getInstance();
+        try {
+            c1.setTimeInMillis(startDate.getTime());
+            c1.add(Calendar.DATE, -28);
+        }catch (Exception e){
+            e.printStackTrace();
+            c1.add(Calendar.YEAR, -1);
+        }
+        Date mStartDate = c1.getTime();
+
+        Calendar c2 = Calendar.getInstance();
+        try {
+            c2.setTimeInMillis(endDate.getTime());
+            c2.add(Calendar.DATE, -28);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Date mEndDate = c2.getTime();
 
         for (int i = 0; i < patients.size(); i++) {
             CTCPatient ctcPatient = patients.get(i);
-            data.put(String.valueOf((i + 2)), new Object[]{
-                    ctcPatient.getCtcNumber()
-                    , ctcPatient.getFirstName() + " " + ctcPatient.getMiddleName() + " " + ctcPatient.getSurname()
-                    , ctcPatient.getGender()
-                    , ctcPatient.getPhoneNumber()
-                    , ctcPatient.getVillage()
-                    , ctcPatient.getWard()
-                    , ctcPatient.getCareTakerName()
-                    , ctcPatient.getCareTakerPhoneNumber()
-                    , simpleDateFormat.format(new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment()))
-            });
+            if(isLTF){
+                Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
+                if(aDate.after(mStartDate) && aDate.before(mEndDate)){
+                    saveData(ctcPatient,i,data);
+                }
+            }else{
+                Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
+                if(aDate.after(startDate) && aDate.before(endDate)){
+                    saveData(ctcPatient,i,data);
+                }
+            }
+
         }
+
+        String summaryMessage;
+        if(isLTF) {
+            summaryMessage = "\n\nPatients with LTFs found = : ";
+        }else{
+            summaryMessage = "\nPatients with Missed Appointments found = : ";
+        }
+
+        Platform.runLater(() -> {
+            log.appendText(summaryMessage + (data.size()-1));
+        });
 
         //Iterate over data and write to sheet
         Set<String> keyset = data.keySet();
@@ -677,5 +701,23 @@ public class Controller implements Initializable {
             }
         }
 
+    }
+
+    private void saveData(CTCPatient ctcPatient, int i, Map<String, Object[]> data ){
+
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        data.put(String.valueOf((i + 2)), new Object[]{
+                ctcPatient.getCtcNumber()
+                , ctcPatient.getFirstName() + " " + ctcPatient.getMiddleName() + " " + ctcPatient.getSurname()
+                , ctcPatient.getGender()
+                , ctcPatient.getPhoneNumber()
+                , ctcPatient.getVillage()
+                , ctcPatient.getWard()
+                , ctcPatient.getCareTakerName()
+                , ctcPatient.getCareTakerPhoneNumber()
+                , simpleDateFormat.format(new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment()))
+        });
     }
 }
