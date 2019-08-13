@@ -2,6 +2,7 @@ package com.softmed.ctc2extractor;
 
 import com.google.gson.Gson;
 import com.healthmarketscience.jackcess.*;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.softmed.ctc2extractor.Model.CTCPatient;
 import com.softmed.ctc2extractor.Model.CTCPatientsModel;
@@ -10,7 +11,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
@@ -47,13 +47,13 @@ public class Controller implements Initializable {
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
-    public Button syncButton;
-    public Button exportToExcel;
     public Label facilityName;
     public Label HFRCode;
     public TextArea log;
     public JFXDatePicker startDatePicker;
     public JFXDatePicker endDatePicker;
+    public JFXButton exportToExcel;
+    public JFXButton syncButton;
     private Date startDate, endDate;
 
 
@@ -488,7 +488,7 @@ public class Controller implements Initializable {
 
         System.out.println("Patients found = " + missedAndLTFAppointmentsPatients.size());
 
-        generateExcel(ctcMissedAppointmentsPatients,ctcLTFPatients);
+        generateExcel(ctcMissedAppointmentsPatients, ctcLTFPatients);
         if (state.equalsIgnoreCase("sync")) {
             syncData(ctcPatientsModel);
         }
@@ -599,7 +599,7 @@ public class Controller implements Initializable {
         }
     }
 
-    private void generateExcel(List<CTCPatient> missedAppointmentsCTCPatients,List<CTCPatient> ltfsCTCPatients) {
+    private void generateExcel(List<CTCPatient> missedAppointmentsCTCPatients, List<CTCPatient> ltfsCTCPatients) {
 
         Platform.runLater(() -> log.appendText("\n\nGenerating EXCEL export"));
 
@@ -607,8 +607,8 @@ public class Controller implements Initializable {
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        createSheet(workbook,ltfsCTCPatients,"Extracted LTFs",true);
-        createSheet(workbook,missedAppointmentsCTCPatients,"Patients with Missed Appointments",false);
+        createSheet(workbook, ltfsCTCPatients, "Extracted LTFs", true);
+        createSheet(workbook, missedAppointmentsCTCPatients, "Patients with Missed Appointments", false);
 
 
         try {
@@ -629,20 +629,20 @@ public class Controller implements Initializable {
     }
 
 
-    private void createSheet(XSSFWorkbook workbook,List<CTCPatient> patients,String sheetName, boolean isLTF){
+    private void createSheet(XSSFWorkbook workbook, List<CTCPatient> patients, String sheetName, boolean isLTF) {
 
         //Create a blank missed appointments sheet
         XSSFSheet missedAppointmentsSheet = workbook.createSheet(sheetName);
 
         //This data needs to be written (Object[])
         Map<String, Object[]> data = new TreeMap<>();
-        data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER","APPOINTMENT DATE"});
+        data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER", "APPOINTMENT DATE"});
 
         Calendar c1 = Calendar.getInstance();
         try {
             c1.setTimeInMillis(startDate.getTime());
             c1.add(Calendar.DATE, -28);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             c1.add(Calendar.YEAR, -1);
         }
@@ -652,7 +652,7 @@ public class Controller implements Initializable {
         try {
             c2.setTimeInMillis(endDate.getTime());
             c2.add(Calendar.DATE, -28);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -660,29 +660,29 @@ public class Controller implements Initializable {
 
         for (int i = 0; i < patients.size(); i++) {
             CTCPatient ctcPatient = patients.get(i);
-            if(isLTF){
+            if (isLTF) {
                 Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
-                if(aDate.after(mStartDate) && aDate.before(mEndDate)){
-                    saveData(ctcPatient,i,data);
+                if (aDate.after(mStartDate) && aDate.before(mEndDate)) {
+                    saveData(ctcPatient, i, data);
                 }
-            }else{
+            } else {
                 Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
-                if(aDate.after(startDate) && aDate.before(endDate)){
-                    saveData(ctcPatient,i,data);
+                if (aDate.after(startDate) && aDate.before(endDate)) {
+                    saveData(ctcPatient, i, data);
                 }
             }
 
         }
 
         String summaryMessage;
-        if(isLTF) {
+        if (isLTF) {
             summaryMessage = "\n\nPatients with LTFs found = : ";
-        }else{
+        } else {
             summaryMessage = "\nPatients with Missed Appointments found = : ";
         }
 
         Platform.runLater(() -> {
-            log.appendText(summaryMessage + (data.size()-1));
+            log.appendText(summaryMessage + (data.size() - 1));
         });
 
         //Iterate over data and write to sheet
@@ -703,7 +703,7 @@ public class Controller implements Initializable {
 
     }
 
-    private void saveData(CTCPatient ctcPatient, int i, Map<String, Object[]> data ){
+    private void saveData(CTCPatient ctcPatient, int i, Map<String, Object[]> data) {
 
         String pattern = "dd-MM-yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
