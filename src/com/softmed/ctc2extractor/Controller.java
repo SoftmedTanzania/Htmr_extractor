@@ -393,8 +393,8 @@ public class Controller implements Initializable {
                     if (!hasVisited) {
                         PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
-                        //status of 1 = missed Appointment
-                        missedAppointment.setStatus(1);
+                        //status of 3 = missed Appointment
+                        missedAppointment.setStatus(3);
                         missedAppointments.add(missedAppointment);
                         missedAppointmentCount++;
                     }
@@ -568,8 +568,8 @@ public class Controller implements Initializable {
         log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
         HttpClient httpClient = new DefaultHttpClient();
-        String username = "admin";
-        String password = "Admin123";
+        String username = "username";
+        String password = "password";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 

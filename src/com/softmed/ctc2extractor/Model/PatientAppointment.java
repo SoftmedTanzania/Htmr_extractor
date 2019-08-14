@@ -4,8 +4,9 @@ public class PatientAppointment {
 	private Long dateOfAppointment;
 	private int appointmentType;
 
-	//status of 1 = missed Appointment
 	//status of 2 = LTF
+	//status of 3 = missed Appointment
+
 	private int status;
 
 	public Long getDateOfAppointment() {
