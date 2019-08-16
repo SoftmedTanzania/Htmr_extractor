@@ -681,8 +681,9 @@ public class Controller implements Initializable {
             summaryMessage = "\nPatients with Missed Appointments found = : ";
         }
 
+        final int dataCount = data.size()-1;
         Platform.runLater(() -> {
-            log.appendText(summaryMessage + (data.size() - 1));
+            log.appendText(summaryMessage + dataCount);
         });
 
         //Iterate over data and write to sheet
