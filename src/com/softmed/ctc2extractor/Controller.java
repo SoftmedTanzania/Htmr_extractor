@@ -567,6 +567,8 @@ public class Controller implements Initializable {
         System.out.println("Sending data to server");
         log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
+
+        System.out.println("Data = "+json);
         HttpClient httpClient = new DefaultHttpClient();
         String username = "username";
         String password = "password";
