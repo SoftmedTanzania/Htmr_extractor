@@ -86,6 +86,11 @@ public class Controller implements Initializable {
         }
         Calendar c = Calendar.getInstance();
         todaysDate = c.getTime();
+        endDate = c.getTime();
+
+        Calendar myCalendar = Calendar.getInstance();
+        myCalendar.add(Calendar.YEAR, -1);
+        startDate = myCalendar.getTime();
 
         try {
             CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
