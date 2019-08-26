@@ -585,8 +585,8 @@ public class Controller implements Initializable {
 
         System.out.println("Data = "+json);
         HttpClient httpClient = new DefaultHttpClient();
-        String username = "admin";
-        String password = "Admin123";
+        String username = "username";
+        String password = "password";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
