@@ -87,6 +87,11 @@ public class Controller implements Initializable {
         }
         Calendar c = Calendar.getInstance();
         todaysDate = c.getTime();
+        endDate = c.getTime();
+
+        Calendar myCalendar = Calendar.getInstance();
+        myCalendar.add(Calendar.YEAR, -1);
+        startDate = myCalendar.getTime();
 
         try {
             CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
@@ -374,9 +379,6 @@ public class Controller implements Initializable {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (appointment.getString("PatientID").equals("05-01-0103-003392")) {
-                    System.out.println("PatientID not found in appointments");
-                }
             }
 
 
@@ -583,13 +585,13 @@ public class Controller implements Initializable {
 
         System.out.println("Data = "+json);
         HttpClient httpClient = new DefaultHttpClient();
-        String username = "username";
-        String password = "password";
+        String username = "admin";
+        String password = "Admin123";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
+            HttpPost request = new HttpPost("http://192.81.128.241:8080/opensrp/save-ctc-patients");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
