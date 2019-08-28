@@ -329,6 +329,12 @@ public class Controller implements Initializable {
 
             ctcPatient.setSurname(patient.getString("SurName"));
             ctcPatient.setCtcNumber(patient.getString("PatientID"));
+
+            System.out.println("CTC Number = "+patient.getString("PatientID"));
+            if(patient.getString("PatientID").equals("07-03-0103-009018")){
+                System.out.println("Found");
+            }
+
             ctcPatient.setPhoneNumber(patient.getString("Contact"));
             ctcPatient.setVillage(patient.getString("VillageMtaa"));
             ctcPatient.setWard(patient.getString("WardName"));
@@ -405,33 +411,52 @@ public class Controller implements Initializable {
             _1yearsAgo = c2.getTime();
 
             try {
+                Date appointmentDate = appointment.getDate("DateOfAppointment");
 
                 //Obtaining all missed appointments in the last 3 days
-                if (appointment.getDate("DateOfAppointment").before(_3DaysAgo) &&
-                        appointment.getDate("DateOfAppointment").after(_28DaysAgo) &&
-                        appointment.getInt("Cancelled") == 0) {
-                    boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
-                    if (!hasVisited) {
-                        PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+                if (appointmentDate.before(_3DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_28DaysAgo)) {
 
-                        //status of 3 = missed Appointment
-                        missedAppointment.setStatus(3);
-                        missedAppointments.add(missedAppointment);
-                        missedAppointmentCount++;
+                    int cancelled = 0;
+                    try {
+                        cancelled = appointment.getInt("Cancelled");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    if(cancelled==0) {
+                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
+                        if (!hasVisited) {
+                            PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+
+                            //status of 3 = missed Appointment
+                            missedAppointment.setStatus(3);
+                            missedAppointments.add(missedAppointment);
+                            missedAppointmentCount++;
+                        }
                     }
                 } else //Obtaining all LTF appointments in the last 28 days
-                    if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
-                            appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
-                            appointment.getInt("Cancelled") == 0) {
-                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
+                    if (appointmentDate.before(_28DaysAgo) &&
+                            appointment.getDate("DateOfAppointment").after(_1yearsAgo)) {
 
-                        if (!hasVisited) {
-                            PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+                        int cancelled = 0;
+                        try {
+                            cancelled = appointment.getInt("Cancelled");
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
 
-                            //status of 2 = LTF
-                            ltfAppointment.setStatus(2);
-                            ltfAppointments.add(ltfAppointment);
-                            ltfAppointmentCount++;
+                        if(cancelled==0) {
+                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
+
+                            if (!hasVisited) {
+                                PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+
+                                //status of 2 = LTF
+                                ltfAppointment.setStatus(2);
+                                ltfAppointments.add(ltfAppointment);
+                                ltfAppointmentCount++;
+                            }
                         }
                     }
             } catch (Exception e) {
