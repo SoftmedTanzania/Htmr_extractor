@@ -389,24 +389,41 @@ public class Controller implements Initializable {
             _1yearsAgo = c2.getTime();
 
             try {
+                Date appointmentDate = appointment.getDate("DateOfAppointment");
 
                 //Obtaining all missed appointments in the last 3 days
-                if (appointment.getDate("DateOfAppointment").before(_3DaysAgo) &&
-                        appointment.getDate("DateOfAppointment").after(_28DaysAgo) &&
-                        appointment.getInt("Cancelled") == 0) {
-                    boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
-                    if (!hasVisited) {
-                        PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+                if (appointmentDate.before(_3DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_28DaysAgo)) {
 
-                        //status of 3 = missed Appointment
-                        missedAppointment.setStatus(3);
-                        missedAppointments.add(missedAppointment);
-                        missedAppointmentCount++;
+                    int cancelled = 0;
+                    try {
+                        cancelled = appointment.getInt("Cancelled");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } else //Obtaining all LTF appointments in the last 28 days
-                    if (appointment.getDate("DateOfAppointment").before(_28DaysAgo) &&
-                            appointment.getDate("DateOfAppointment").after(_1yearsAgo) &&
-                            appointment.getInt("Cancelled") == 0) {
+
+                    if (cancelled == 0) {
+                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
+                        if (!hasVisited) {
+                            PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+
+                            //status of 3 = missed Appointment
+                            missedAppointment.setStatus(3);
+                            missedAppointments.add(missedAppointment);
+                            missedAppointmentCount++;
+                        }
+                    }
+                } else if (appointmentDate.before(_28DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_1yearsAgo)) {  //Obtaining all LTF appointments in the last 28 days
+
+                    int cancelled = 0;
+                    try {
+                        cancelled = appointment.getInt("Cancelled");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    if (cancelled == 0) {
                         boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
 
                         if (!hasVisited) {
@@ -418,6 +435,7 @@ public class Controller implements Initializable {
                             ltfAppointmentCount++;
                         }
                     }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
