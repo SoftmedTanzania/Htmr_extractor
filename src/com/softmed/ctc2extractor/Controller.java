@@ -1,8 +1,8 @@
 package com.softmed.ctc2extractor;
 
 import com.google.gson.Gson;
-import com.healthmarketscience.jackcess.*;
 import com.healthmarketscience.jackcess.Cursor;
+import com.healthmarketscience.jackcess.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.softmed.ctc2extractor.Model.CTCPatient;
@@ -330,8 +330,8 @@ public class Controller implements Initializable {
             ctcPatient.setSurname(patient.getString("SurName"));
             ctcPatient.setCtcNumber(patient.getString("PatientID"));
 
-            System.out.println("CTC Number = "+patient.getString("PatientID"));
-            if(patient.getString("PatientID").equals("07-03-0103-009018")){
+            System.out.println("CTC Number = " + patient.getString("PatientID"));
+            if (patient.getString("PatientID").equals("07-03-0103-009018")) {
                 System.out.println("Found");
             }
 
@@ -372,7 +372,6 @@ public class Controller implements Initializable {
             Row appointment = null;
 
 
-
             while (true) {
                 try {
                     if (!cursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID"))))
@@ -388,8 +387,7 @@ public class Controller implements Initializable {
             }
 
 
-
-                //Calculating the date of the last 28 days from now
+            //Calculating the date of the last 28 days from now
             Date _28DaysAgo = new Date();
             Calendar c1 = Calendar.getInstance();
 
@@ -420,11 +418,11 @@ public class Controller implements Initializable {
                     int cancelled = 0;
                     try {
                         cancelled = appointment.getInt("Cancelled");
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    if(cancelled==0) {
+                    if (cancelled == 0) {
                         boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
                         if (!hasVisited) {
                             PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
@@ -435,30 +433,29 @@ public class Controller implements Initializable {
                             missedAppointmentCount++;
                         }
                     }
-                } else //Obtaining all LTF appointments in the last 28 days
-                    if (appointmentDate.before(_28DaysAgo) &&
-                            appointment.getDate("DateOfAppointment").after(_1yearsAgo)) {
+                } else if (appointmentDate.before(_28DaysAgo) &&
+                        appointment.getDate("DateOfAppointment").after(_1yearsAgo)) {  //Obtaining all LTF appointments in the last 28 days
 
-                        int cancelled = 0;
-                        try {
-                            cancelled = appointment.getInt("Cancelled");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
+                    int cancelled = 0;
+                    try {
+                        cancelled = appointment.getInt("Cancelled");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                        if(cancelled==0) {
-                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
+                    if (cancelled == 0) {
+                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
 
-                            if (!hasVisited) {
-                                PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
+                        if (!hasVisited) {
+                            PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
-                                //status of 2 = LTF
-                                ltfAppointment.setStatus(2);
-                                ltfAppointments.add(ltfAppointment);
-                                ltfAppointmentCount++;
-                            }
+                            //status of 2 = LTF
+                            ltfAppointment.setStatus(2);
+                            ltfAppointments.add(ltfAppointment);
+                            ltfAppointmentCount++;
                         }
                     }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -608,7 +605,7 @@ public class Controller implements Initializable {
         log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
 
-        System.out.println("Data = "+json);
+        System.out.println("Data = " + json);
         HttpClient httpClient = new DefaultHttpClient();
         String username = "username";
         String password = "password";
@@ -723,7 +720,7 @@ public class Controller implements Initializable {
             summaryMessage = "\nPatients with Missed Appointments found = : ";
         }
 
-        final int dataCount = data.size()-1;
+        final int dataCount = data.size() - 1;
         Platform.runLater(() -> {
             log.appendText(summaryMessage + dataCount);
         });
