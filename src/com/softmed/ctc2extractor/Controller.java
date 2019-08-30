@@ -35,14 +35,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 
 public class Controller implements Initializable {
-    private static final String TAG_CTC2_FILE_LOCAITON = "CTC2FileLocation";
+    private static final String TAG_SQLSERVER_USERNAME = "sqlServerUsername";
+    private static final String TAG_SQLSERVER_PASSWORD = "sqlServerPassword";
+    private static final String TAG_SQLSERVER_DB = "sqlServerDB";
     private static String configurationFile = "helper.properties";
-    private static String CTC2DatabaseLocation;
+    private static String username;
     private static Database db;
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
@@ -57,7 +61,7 @@ public class Controller implements Initializable {
     private Date startDate, endDate;
 
 
-    private static void createDefault(String fileName, String sourceFile) throws Exception {
+    private static void createDefault(String fileName, String sqlServerUsername,String sqlServerPassword,String sqlServerDB) throws Exception {
         File file = new File(fileName);
         if (file.exists()) {
             file.renameTo(new File(fileName + ".bak"));
@@ -65,7 +69,9 @@ public class Controller implements Initializable {
         file.createNewFile();
         PropertiesConfiguration config = new PropertiesConfiguration(
                 fileName);
-        config.setProperty(TAG_CTC2_FILE_LOCAITON, sourceFile);
+        config.setProperty(TAG_SQLSERVER_USERNAME, sqlServerUsername);
+        config.setProperty(TAG_SQLSERVER_PASSWORD, sqlServerPassword);
+        config.setProperty(TAG_SQLSERVER_DB, sqlServerDB);
         config.save();
     }
 
@@ -73,12 +79,12 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Configuration configuration = null;
         try {
-            configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
+            configuration = loadFirst(configurationFile);
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                createDefault(configurationFile, "");
-                configuration = loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
+                createDefault(configurationFile, "","","");
+                configuration = loadFirst(configurationFile);
             } catch (Exception e1) {
                 e1.printStackTrace();
                 log.appendText("\n\nError Encountered : " + e1.getMessage());
@@ -93,18 +99,34 @@ public class Controller implements Initializable {
         startDate = myCalendar.getTime();
 
         try {
-            CTC2DatabaseLocation = configuration.getString(TAG_CTC2_FILE_LOCAITON);
-            getFacilityConfig(CTC2DatabaseLocation);
+            username = configuration.getString(TAG_SQLSERVER_USERNAME);
+
+
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
+                    "databaseName=AdventureWorks;user=MyUserName;password=*****;";
+            Connection con = DriverManager.getConnection(connectionUrl);
+
+
+
+
+
+            getFacilityConfig(username);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
-        if (CTC2DatabaseLocation == null || CTC2DatabaseLocation.equals("")) {
-            CTC2DatabaseLocation = "Please select the CTC Database location in settings";
+        if (username == null || username.equals("")) {
+            username = "Please select the CTC Database location in settings";
         }
 
-        facilityName.setText("CTC2 File Location : " + CTC2DatabaseLocation);
+        facilityName.setText("CTC2 File Location : " + username);
 
         final JLabel label4 = new JLabel();
         if (hfrCode.equals("")) {
@@ -144,8 +166,8 @@ public class Controller implements Initializable {
     public void ExportToExcel() {
         Runnable r = new Runnable() {
             public void run() {
-                if (CTC2DatabaseLocation != null && !hfrCode.equals("")) {
-                    ObtainDataFromCTC2(CTC2DatabaseLocation, "export");
+                if (username != null && !hfrCode.equals("")) {
+                    ObtainDataFromCTC2(username, "export");
                 } else {
                     log.appendText("\n\n Please select the correct CTC2 Database location");
                 }
@@ -157,8 +179,8 @@ public class Controller implements Initializable {
     public void SyncData() {
         Runnable r = new Runnable() {
             public void run() {
-                if (CTC2DatabaseLocation != null && !hfrCode.equals("")) {
-                    ObtainDataFromCTC2(CTC2DatabaseLocation, "sync");
+                if (username != null && !hfrCode.equals("")) {
+                    ObtainDataFromCTC2(username, "sync");
                 } else {
                     log.appendText("\n\n Please select the correct CTC2 Database location");
                 }
@@ -167,7 +189,7 @@ public class Controller implements Initializable {
         new Thread(r).start();
     }
 
-    Configuration loadFirst(String prefix, String fileNames) {
+    Configuration loadFirst(String fileNames) {
         try {
             Configuration cf = new PropertiesConfiguration(fileNames)
                     .interpolatedConfiguration();
@@ -234,16 +256,16 @@ public class Controller implements Initializable {
         System.out.println("Selected file: " + selectedFile.getAbsolutePath());
 
         try {
-            createDefault(configurationFile, selectedFile.getAbsolutePath());
+            createDefault(configurationFile, selectedFile.getAbsolutePath(),"","");
         } catch (Exception e1) {
             e1.printStackTrace();
 
             log.appendText("\n\nError Encountered : " + e1.getMessage());
         }
-        loadFirst(TAG_CTC2_FILE_LOCAITON, configurationFile);
-        CTC2DatabaseLocation = selectedFile.getAbsolutePath();
-        getFacilityConfig(CTC2DatabaseLocation);
-        facilityName.setText("File Location :" + CTC2DatabaseLocation);
+        loadFirst(configurationFile);
+        username = selectedFile.getAbsolutePath();
+        getFacilityConfig(username);
+        facilityName.setText("File Location :" + username);
 
         HFRCode.setText("Facility HFR Code  :  " + hfrCode);
     }
