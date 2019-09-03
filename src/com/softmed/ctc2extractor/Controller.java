@@ -1,7 +1,6 @@
 package com.softmed.ctc2extractor;
 
 import com.google.gson.Gson;
-import com.healthmarketscience.jackcess.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.softmed.ctc2extractor.Model.CTCPatient;
@@ -33,11 +32,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.*;
 
@@ -46,8 +44,9 @@ public class Controller implements Initializable {
     private static final String TAG_SQLSERVER_PASSWORD = "sqlServerPassword";
     private static final String TAG_SQLSERVER_DB = "sqlServerDB";
     private static String configurationFile = "helper.properties";
-    private static String username;
-    private static Database db;
+    private static String username,
+            dbName,
+            password;
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
@@ -61,7 +60,7 @@ public class Controller implements Initializable {
     private Date startDate, endDate;
 
 
-    private static void createDefault(String fileName, String sqlServerUsername,String sqlServerPassword,String sqlServerDB) throws Exception {
+    private static void createDefault(String fileName, String sqlServerUsername, String sqlServerPassword, String sqlServerDB) throws Exception {
         File file = new File(fileName);
         if (file.exists()) {
             file.renameTo(new File(fileName + ".bak"));
@@ -83,7 +82,7 @@ public class Controller implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                createDefault(configurationFile, "","","");
+                createDefault(configurationFile, "", "", "");
                 configuration = loadFirst(configurationFile);
             } catch (Exception e1) {
                 e1.printStackTrace();
@@ -100,7 +99,13 @@ public class Controller implements Initializable {
 
         try {
             username = configuration.getString(TAG_SQLSERVER_USERNAME);
+            password = configuration.getString(TAG_SQLSERVER_PASSWORD);
+            dbName = configuration.getString(TAG_SQLSERVER_USERNAME);
 
+
+            dbName = "CTC2data107872_4";
+            username = "extractor";
+            password = "123";
 
             try {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -108,22 +113,21 @@ public class Controller implements Initializable {
                 e.printStackTrace();
             }
 
-            String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
-                    "databaseName=AdventureWorks;user=MyUserName;password=*****;";
-            Connection con = DriverManager.getConnection(connectionUrl);
+            String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+            try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+                getFacilityConfig(stmt);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
-
-
-
-            getFacilityConfig(username);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
         if (username == null || username.equals("")) {
-            username = "Please select the CTC Database location in settings";
+            username = "Please set username the Computer in settings";
         }
 
         facilityName.setText("CTC2 File Location : " + username);
@@ -204,43 +208,38 @@ public class Controller implements Initializable {
         return null;
     }
 
-    public void getFacilityConfig(String fileLocation) {
+    public void getFacilityConfig(Statement stmt) {
+
+        ResultSet rsConfig;
+        String SqlConfig = "SELECT * FROM dbo.tblConfig ";
+
+
         try {
-            db = DatabaseBuilder.open(new File(fileLocation));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Table table = null;
-        try {
-            table = db.getTable("tblConfig");
-        } catch (IOException e) {
+            rsConfig = stmt.executeQuery(SqlConfig);
+            rsConfig.first();
+
+            regcode = rsConfig.getString("RegionCode");
+            discode = rsConfig.getString("DistrictCode");
+            facility = rsConfig.getString("FacilityCode");
+            healthcentre = rsConfig.getString("HealthCentreCode");
+            hfrCode = rsConfig.getString("HFRCode");
+
+            if (regcode.length() == 1) {
+                regcode = "0" + regcode;
+            }
+            if (discode.length() == 1) {
+                discode = "0" + discode;
+            }
+            if (facility.length() == 1) {
+                facility = "0" + facility;
+            }
+            if (healthcentre.length() == 1) {
+                healthcentre = "0" + healthcentre;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             log.appendText("\n\nError Encountered : " + e.getMessage());
         }
-
-
-        for (Row row : table) {
-            regcode = row.getInt("RegionCode").toString();
-            discode = row.getInt("DistrictCode").toString();
-            facility = row.getInt("FacilityCode").toString();
-            healthcentre = row.getInt("HealthCentreCode").toString();
-            hfrCode = row.getString("HFRCode");
-        }
-
-        if (regcode.length() == 1) {
-            regcode = "0" + regcode;
-        }
-        if (discode.length() == 1) {
-            discode = "0" + discode;
-        }
-        if (facility.length() == 1) {
-            facility = "0" + facility;
-        }
-        if (healthcentre.length() == 1) {
-            healthcentre = "0" + healthcentre;
-        }
-
-
     }
 
     public void setLocation() {
@@ -256,15 +255,33 @@ public class Controller implements Initializable {
         System.out.println("Selected file: " + selectedFile.getAbsolutePath());
 
         try {
-            createDefault(configurationFile, selectedFile.getAbsolutePath(),"","");
+            createDefault(configurationFile, selectedFile.getAbsolutePath(), "", "");
         } catch (Exception e1) {
             e1.printStackTrace();
 
             log.appendText("\n\nError Encountered : " + e1.getMessage());
         }
         loadFirst(configurationFile);
-        username = selectedFile.getAbsolutePath();
-        getFacilityConfig(username);
+
+
+        dbName = "CTC2data107872_4";
+        username = "extractor";
+        password = "123";
+
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+            getFacilityConfig(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         facilityName.setText("File Location :" + username);
 
         HFRCode.setText("Facility HFR Code  :  " + hfrCode);
@@ -272,13 +289,6 @@ public class Controller implements Initializable {
 
 
     private void ObtainDataFromCTC2(String fileLocation, String state) {
-        try {
-            System.out.println("CTC DATABASE Location = " + fileLocation);
-            db = DatabaseBuilder.open(new File(fileLocation));
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.appendText("\n\nError Encountered : " + e.getMessage());
-        }
 
         CTCPatientsModel ctcPatientsModel = new CTCPatientsModel();
 
@@ -295,234 +305,171 @@ public class Controller implements Initializable {
         ctcPatientsModel.setFacilityCTC2Code(centrecode);
         ctcPatientsModel.setHfrCode(hfrCode);
 
-
-        Table tblPatients = null;
-        try {
-            tblPatients = db.getTable("tblPatients");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Table tblStatus = null;
-        try {
-            tblStatus = db.getTable("tblStatus");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Table tblAppointments = null;
-        try {
-            tblAppointments = db.getTable("tblAppointments");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Table tblVisits = null;
-        try {
-            tblVisits = db.getTable("tblVisits");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Table tblPregnancies = null;
-        try {
-            tblPregnancies = db.getTable("tblPregnancies");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
         //Obtaining data
         final java.util.List<CTCPatient> ctcLTFPatients = new ArrayList<>();
         final java.util.List<CTCPatient> ctcMissedAppointmentsPatients = new ArrayList<>();
         System.out.println("Patients Information");
-        for (final Row patient : tblPatients) {
-            CTCPatient ctcPatient = new CTCPatient();
-            ctcPatient.setHealthFacilityCode(centrecode);
-            try {
-                ctcPatient.setFirstName(patient.getString("FirstName").split(" ")[0]);
-                ctcPatient.setMiddleName(patient.getString("FirstName").split(" ")[1]);
-                System.out.println("Middle Name : " + ctcPatient.getMiddleName());
-            } catch (Exception e) {
-                ctcPatient.setMiddleName("");
-                e.printStackTrace();
-            }
 
-            ctcPatient.setSurname(patient.getString("SurName"));
-            ctcPatient.setCtcNumber(patient.getString("PatientID"));
-            ctcPatient.setPhoneNumber(patient.getString("Contact"));
-            ctcPatient.setVillage(patient.getString("VillageMtaa"));
-            ctcPatient.setWard(patient.getString("WardName"));
-            ctcPatient.setCareTakerName(patient.getString("Helper"));
-            ctcPatient.setCareTakerPhoneNumber(patient.getString("HelperContact"));
-            ctcPatient.setDateOfBirth(patient.getDate("DateOfBirth").getTime());
-            ctcPatient.setGender(patient.getString("Sex"));
-            try {
-                ctcPatient.setDateOfDeath(patient.getDate("DateOfDeath").getTime());
-                continue;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ctcPatient.setHivStatus(true);
-
-            List<PatientAppointment> missedAppointments = new ArrayList<PatientAppointment>();
-            List<PatientAppointment> ltfAppointments = new ArrayList<PatientAppointment>();
-            int missedAppointmentCount = 0;
-            int ltfAppointmentCount = 0;
-
-            IndexCursor statusCursor = null;
-            try {
-                statusCursor = CursorBuilder.createCursor(tblStatus.getIndex("PatientID"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            IndexCursor cursor = null;
-            try {
-                cursor = CursorBuilder.createCursor(tblAppointments.getIndex("PatientID"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Row appointment = null;
-            for (Row app : cursor.newEntryIterable(patient.getString("PatientID"))) {
-                appointment = app;
-            }
-
-            //Calculating the date of the last 28 days from now
-            Date _28DaysAgo = new Date();
-            Calendar c1 = Calendar.getInstance();
-
-            c1.add(Calendar.DATE, -28);
-            _28DaysAgo = c1.getTime();
-
-            //Calculating the date of the last 3 days from now
-            Date _3DaysAgo = new Date();
-            Calendar c3 = Calendar.getInstance();
-
-            c3.add(Calendar.DATE, -3);
-            _3DaysAgo = c3.getTime();
+        String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
+            String SQL = "SELECT  * FROM dbo.tblPatients";
+            ResultSet rsPatient = stmt.executeQuery(SQL);
 
 
-            //Calculating the date of the last 28 days from now
-            Date _1yearsAgo = new Date();
-            Calendar c2 = Calendar.getInstance();
-            c2.add(Calendar.YEAR, -1);
-            _1yearsAgo = c2.getTime();
+            // Iterate through the data in the result set and display it.
+            while (rsPatient.next()) {
 
-            try {
-                Date appointmentDate = appointment.getDate("DateOfAppointment");
+                CTCPatient ctcPatient = new CTCPatient();
+                ctcPatient.setHealthFacilityCode(centrecode);
+                try {
+                    ctcPatient.setFirstName(rsPatient.getString("FirstName").split(" ")[0]);
+                    ctcPatient.setMiddleName(rsPatient.getString("FirstName").split(" ")[1]);
+                } catch (Exception e) {
+                    ctcPatient.setMiddleName("");
+                    e.printStackTrace();
+                }
 
-                //Obtaining all missed appointments in the last 3 days
-                if (appointmentDate.before(_3DaysAgo) &&
-                        appointment.getDate("DateOfAppointment").after(_28DaysAgo)) {
+                ctcPatient.setSurname(rsPatient.getString("SurName"));
+                ctcPatient.setCtcNumber(rsPatient.getString("PatientID"));
+                ctcPatient.setPhoneNumber(rsPatient.getString("Contact"));
+                ctcPatient.setVillage(rsPatient.getString("VillageMtaa"));
+                ctcPatient.setWard(rsPatient.getString("WardName"));
+                ctcPatient.setCareTakerName(rsPatient.getString("Helper"));
+                ctcPatient.setCareTakerPhoneNumber(rsPatient.getString("HelperContact"));
+                ctcPatient.setDateOfBirth(rsPatient.getDate("DateOfBirth").getTime());
+                ctcPatient.setGender(rsPatient.getString("Sex"));
+                try {
+                    ctcPatient.setDateOfDeath(rsPatient.getDate("DateOfDeath").getTime());
+                    continue;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ctcPatient.setHivStatus(true);
 
-                    int cancelled = 0;
-                    try {
-                        cancelled = appointment.getInt("Cancelled");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                List<PatientAppointment> missedAppointments = new ArrayList<PatientAppointment>();
+                List<PatientAppointment> ltfAppointments = new ArrayList<PatientAppointment>();
+                int missedAppointmentCount = 0;
+                int ltfAppointmentCount = 0;
 
-                    if (cancelled == 0) {
-                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _3DaysAgo, tblVisits);
-                        if (!hasVisited) {
-                            PatientAppointment missedAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
-                            //status of 3 = missed Appointment
-                            missedAppointment.setStatus(3);
-                            missedAppointments.add(missedAppointment);
-                            missedAppointmentCount++;
+                String SqlLastAppointment = "SELECT TOP(1) * FROM dbo.tblAppointments WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY DateAppointmentGiven DESC";
+                ResultSet rsAppointment = stmt.executeQuery(SqlLastAppointment);
+                rsAppointment.first();
+
+                //Calculating the date of the last 28 days from now
+                Date _28DaysAgo = new Date();
+                Calendar c1 = Calendar.getInstance();
+
+                c1.add(Calendar.DATE, -28);
+                _28DaysAgo = c1.getTime();
+
+                //Calculating the date of the last 3 days from now
+                Date _3DaysAgo = new Date();
+                Calendar c3 = Calendar.getInstance();
+
+                c3.add(Calendar.DATE, -3);
+                _3DaysAgo = c3.getTime();
+
+
+                //Calculating the date of the last 28 days from now
+                Date _1yearsAgo = new Date();
+                Calendar c2 = Calendar.getInstance();
+                c2.add(Calendar.YEAR, -1);
+                _1yearsAgo = c2.getTime();
+
+                try {
+                    Date appointmentDate = rsAppointment.getDate("DateOfAppointment");
+
+                    //Obtaining all missed appointments in the last 3 days
+                    if (appointmentDate.before(_3DaysAgo) &&
+                            rsAppointment.getDate("DateOfAppointment").after(_28DaysAgo)) {
+
+                        int cancelled = 0;
+                        try {
+                            cancelled = rsAppointment.getInt("Cancelled");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if (cancelled == 0) {
+                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _3DaysAgo, stmt);
+                            if (!hasVisited) {
+                                PatientAppointment missedAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmt);
+
+                                //status of 3 = missed Appointment
+                                missedAppointment.setStatus(3);
+                                missedAppointments.add(missedAppointment);
+                                missedAppointmentCount++;
+                            }
+                        }
+                    } else if (appointmentDate.before(_28DaysAgo) &&
+                            rsAppointment.getDate("DateOfAppointment").after(_1yearsAgo)) {  //Obtaining all LTF appointments in the last 28 days
+
+                        int cancelled = 0;
+                        try {
+                            cancelled = rsAppointment.getInt("Cancelled");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if (cancelled == 0) {
+                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _28DaysAgo, stmt);
+
+                            if (!hasVisited) {
+                                PatientAppointment ltfAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmt);
+
+                                //status of 2 = LTF
+                                ltfAppointment.setStatus(2);
+                                ltfAppointments.add(ltfAppointment);
+                                ltfAppointmentCount++;
+                            }
                         }
                     }
-                } else if (appointmentDate.before(_28DaysAgo) &&
-                        appointment.getDate("DateOfAppointment").after(_1yearsAgo)) {  //Obtaining all LTF appointments in the last 28 days
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                    int cancelled = 0;
-                    try {
-                        cancelled = appointment.getInt("Cancelled");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                if (missedAppointmentCount > 0 || ltfAppointmentCount > 0) {
 
-                    if (cancelled == 0) {
-                        boolean hasVisited = checkIfTheClientHasVisitedTheFacility(appointment, patient, _28DaysAgo, tblVisits);
+                    String SqlStatus = "SELECT TOP(1) * FROM dbo.tblStatus WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY StatusDate DESC";
+                    ResultSet rsStatus = stmt.executeQuery(SqlStatus);
+                    rsStatus.first();
 
-                        if (!hasVisited) {
-                            PatientAppointment ltfAppointment = createMissedAppointment(appointment, patient, ctcPatient, tblPregnancies);
 
-                            //status of 2 = LTF
-                            ltfAppointment.setStatus(2);
-                            ltfAppointments.add(ltfAppointment);
-                            ltfAppointmentCount++;
+                    if (!rsStatus.getString("Status").toLowerCase().contains("transferred") && !rsStatus.getString("Status").toLowerCase().contains("died") && !rsStatus.getString("Status").toLowerCase().contains("opted")) {
+                        if (missedAppointmentCount > 0) {
+                            ctcPatient.setPatientAppointments(missedAppointments);
+                            ctcMissedAppointmentsPatients.add(ctcPatient);
+                        } else {
+                            ctcPatient.setPatientAppointments(ltfAppointments);
+                            ctcLTFPatients.add(ctcPatient);
+                        }
+
+                        System.out.println("*****************************************************************************");
+                        System.out.println("PatientID = " + rsPatient.getString("PatientID"));
+                        System.out.println("*****************************************************************************");
+
+
+                        if (missedAppointmentCount > 0) {
+                            Platform.runLater(() -> log.appendText("\nChecking Missed Appointment Patient = : " + ctcPatient.getCtcNumber()));
+                        } else if (ltfAppointmentCount > 0) {
+                            Platform.runLater(() -> log.appendText("\nChecking LTF Patient = : " + ctcPatient.getCtcNumber()));
                         }
                     }
+
+
+                    rsStatus.close();
+
+
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+
             }
 
-            if (missedAppointmentCount > 0 || ltfAppointmentCount > 0) {
-                Row statusRow = null;
-                for (Row tempRow : statusCursor.newEntryIterable(patient.getString("PatientID"))) {
-                    if (statusRow == null) {
-                        statusRow = tempRow;
-                    } else if (statusRow.getDate("StatusDate") == null) {
-                        statusRow = tempRow;
-                    } else if (statusRow.getDate("StatusDate").before(tempRow.getDate("StatusDate")))
-                        statusRow = tempRow;
-
-
-                    System.out.println("Status : " + statusRow.getString("Status") + " Date : " + statusRow.getDate("StatusDate").toString());
-                }
-
-
-                while (true) {
-                    try {
-                        if (!statusCursor.findNextRow(Collections.singletonMap("PatientID", patient.getString("PatientID"))))
-                            break;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        if (statusRow == null) {
-                            statusRow = statusCursor.getCurrentRow();
-                        } else if (statusRow.getDate("StatusDate") == null) {
-                            statusRow = statusCursor.getCurrentRow();
-                        } else if (statusRow.getDate("StatusDate").before(statusCursor.getCurrentRow().getDate("StatusDate")))
-                            statusRow = statusCursor.getCurrentRow();
-
-                        System.out.println("Status : " + statusRow.getString("Status") + " Date : " + statusRow.getDate("StatusDate").toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                if (statusRow != null && !statusRow.getString("Status").toLowerCase().contains("transferred") && !statusRow.getString("Status").toLowerCase().contains("died") && !statusRow.getString("Status").toLowerCase().contains("opted")) {
-                    if (missedAppointmentCount > 0) {
-                        ctcPatient.setPatientAppointments(missedAppointments);
-                        ctcMissedAppointmentsPatients.add(ctcPatient);
-                    } else if (ltfAppointmentCount > 0) {
-                        ctcPatient.setPatientAppointments(ltfAppointments);
-                        ctcLTFPatients.add(ctcPatient);
-                    }
-
-                    System.out.println("*****************************************************************************");
-                    System.out.println("PatientID = " + patient.getString("PatientID"));
-                    System.out.println("*****************************************************************************");
-
-
-                    if (missedAppointmentCount > 0) {
-                        Platform.runLater(() -> log.appendText("\nChecking Missed Appointment Patient = : " + patient.getString("PatientID")));
-                    } else if (ltfAppointmentCount > 0) {
-                        Platform.runLater(() -> log.appendText("\nChecking LTF Patient = : " + patient.getString("PatientID")));
-                    }
-                }
-
-
-            }
+        }
+        // Handle any errors that may have occurred.
+        catch (SQLException e) {
+            e.printStackTrace();
+            log.appendText("\n\nError Encountered : " + e.getMessage());
         }
 
         java.util.List<CTCPatient> missedAndLTFAppointmentsPatients = new ArrayList<>();
@@ -539,30 +486,31 @@ public class Controller implements Initializable {
         }
     }
 
-    private boolean checkIfTheClientHasVisitedTheFacility(Row appointment, Row patient, Date visitAppointmentDate, Table tblVisits) {
+    private boolean checkIfTheClientHasVisitedTheFacility(ResultSet appointment, CTCPatient patient, Date visitAppointmentDate, Statement stmt) {
         boolean hasVisited = false;
 
-        IndexCursor visitsCursor = null;
+
+        String SqlLastVisit = "SELECT TOP(1) * FROM dbo.tblVisits WHERE PatientID='" + patient.getCtcNumber() + "' ORDER BY VisitDate DESC";
+
+        ResultSet rsVisit = null;
         try {
-            visitsCursor = CursorBuilder.createCursor(tblVisits.getIndex("PatientID"));
-        } catch (IOException e) {
+            rsVisit = stmt.executeQuery(SqlLastVisit);
+            rsVisit.first();
+            Date visitDate = rsVisit.getDate("VisitDate");
+            Calendar c = Calendar.getInstance();
+            c.setTime(appointment.getDate("DateAppointmentGiven"));
+            Date appDate = c.getTime();
+
+            if ((visitDate.after(visitAppointmentDate) || visitDate.after(appDate)) &&
+                    visitDate.before(todaysDate)) {
+                hasVisited = true;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        for (Row visit : visitsCursor.newEntryIterable(patient.getString("PatientID"))) {
+        } finally {
             try {
-                Date visitDate = visit.getDate("VisitDate");
-                Calendar c = Calendar.getInstance();
-                c.setTime(appointment.getDate("DateAppointmentGiven"));
-                Date appDate = c.getTime();
-
-                if ((visitDate.after(visitAppointmentDate) || visitDate.after(appDate)) &&
-                        visitDate.before(todaysDate) &&
-                        visit.getString("PatientID").equals(appointment.getString("PatientID"))) {
-                    hasVisited = true;
-                    break;
-                }
-            } catch (Exception e) {
+                rsVisit.close();
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
@@ -570,9 +518,9 @@ public class Controller implements Initializable {
         return hasVisited;
     }
 
-    private PatientAppointment createMissedAppointment(Row appointment, Row patient, CTCPatient ctcPatient, Table tblPregnancies) {
+    private PatientAppointment createMissedAppointment(Date dateOfAppointment, CTCPatient ctcPatient, Statement stmt) {
         PatientAppointment missedAppointment = new PatientAppointment();
-        missedAppointment.setDateOfAppointment(appointment.getDate("DateOfAppointment").getTime());
+        missedAppointment.setDateOfAppointment(dateOfAppointment.getTime());
         missedAppointment.setStatus(-1);
 
         //setting the appointment type to be CTC appointment by default and updating it if the patient is a PMTCT case
@@ -581,25 +529,28 @@ public class Controller implements Initializable {
         //checking if the mother is pregnant, i.e has pregnancies that their due dates are after today
         if (ctcPatient.getGender().equalsIgnoreCase("female")) {
 
-            IndexCursor pregnancyCursor = null;
-            try {
-                pregnancyCursor = CursorBuilder.createCursor(tblPregnancies.getIndex("PatientID"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            for (Row pregnancy : pregnancyCursor.newEntryIterable(patient.getString("PatientID"))) {
+            ResultSet rsPregnancy = null;
+            String SqlLastPregnancy = "SELECT TOP(1) * FROM dbo.tblPregnancies WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY DueDate DESC";
+
+
+            try {
+                rsPregnancy = stmt.executeQuery(SqlLastPregnancy);
+                rsPregnancy.first();
+
+                Date dateOfBirth = rsPregnancy.getDate("DateOfBirth");
+                if (dateOfBirth == null && rsPregnancy.getDate("DueDate").after(todaysDate)) {
+                    //Pregnant mother found.
+                    System.out.println("Pregnant mother found = " + new Gson().toJson(ctcPatient));
+                    missedAppointment.setAppointmentType(2);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
                 try {
-                    Date dateOfBirth = pregnancy.getDate("DateOfBirth");
-                    if (dateOfBirth == null
-                            && pregnancy.getDate("DueDate").after(todaysDate)
-                    ) {
-                        //Pregnant mother found.
-                        System.out.println("Pregnant mother found = " + new Gson().toJson(ctcPatient));
-                        missedAppointment.setAppointmentType(2);
-                        break;
-                    }
-                } catch (Exception e) {
+                    rsPregnancy.close();
+                } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
@@ -613,7 +564,7 @@ public class Controller implements Initializable {
         log.appendText("\n\nSending data to server");
         String json = new Gson().toJson(ctcPatientsModel);
 
-        System.out.println("Data = "+json);
+        System.out.println("Data = " + json);
         HttpClient httpClient = new DefaultHttpClient();
         String username = "username";
         String password = "password";
@@ -728,7 +679,7 @@ public class Controller implements Initializable {
             summaryMessage = "\nPatients with Missed Appointments found = : ";
         }
 
-        final int dataCount = data.size()-1;
+        final int dataCount = data.size() - 1;
         Platform.runLater(() -> {
             log.appendText(summaryMessage + dataCount);
         });
