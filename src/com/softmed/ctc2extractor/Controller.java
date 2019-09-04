@@ -130,7 +130,7 @@ public class Controller implements Initializable {
             username = "Please set username the Computer in settings";
         }
 
-        DatabaseNameLabel.setText("CTC2 File Location : " + username);
+        DatabaseNameLabel.setText("Database Name : " + dbName);
 
         final JLabel label4 = new JLabel();
         if (hfrCode.equals("")) {
@@ -352,8 +352,10 @@ public class Controller implements Initializable {
                 int ltfAppointmentCount = 0;
 
 
+
+                Statement stmtAppointment = con.createStatement();
                 String SqlLastAppointment = "SELECT TOP(1) * FROM dbo.tblAppointments WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY DateAppointmentGiven DESC";
-                ResultSet rsAppointment = stmt.executeQuery(SqlLastAppointment);
+                ResultSet rsAppointment = stmtAppointment.executeQuery(SqlLastAppointment);
                 rsAppointment.next();
 
                 //Calculating the date of the last 28 days from now
@@ -392,9 +394,10 @@ public class Controller implements Initializable {
                         }
 
                         if (cancelled == 0) {
-                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _3DaysAgo, stmt);
+                            Statement stmtVisit = con.createStatement();
+                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _3DaysAgo, stmtVisit);
                             if (!hasVisited) {
-                                PatientAppointment missedAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmt);
+                                PatientAppointment missedAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmtVisit);
 
                                 //status of 3 = missed Appointment
                                 missedAppointment.setStatus(3);
@@ -413,10 +416,12 @@ public class Controller implements Initializable {
                         }
 
                         if (cancelled == 0) {
-                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _28DaysAgo, stmt);
+
+                            Statement stmtVisit = con.createStatement();
+                            boolean hasVisited = checkIfTheClientHasVisitedTheFacility(rsAppointment, ctcPatient, _28DaysAgo, stmtVisit);
 
                             if (!hasVisited) {
-                                PatientAppointment ltfAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmt);
+                                PatientAppointment ltfAppointment = createMissedAppointment(appointmentDate, ctcPatient, stmtVisit);
 
                                 //status of 2 = LTF
                                 ltfAppointment.setStatus(2);
@@ -429,10 +434,16 @@ public class Controller implements Initializable {
                     e.printStackTrace();
                 }
 
+
+                rsAppointment.close();
+                stmtAppointment.close();
+
                 if (missedAppointmentCount > 0 || ltfAppointmentCount > 0) {
 
+
+                    Statement stmtStatus = con.createStatement();
                     String SqlStatus = "SELECT TOP(1) * FROM dbo.tblStatus WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY StatusDate DESC";
-                    ResultSet rsStatus = stmt.executeQuery(SqlStatus);
+                    ResultSet rsStatus = stmtStatus.executeQuery(SqlStatus);
                     rsStatus.next();
 
 
