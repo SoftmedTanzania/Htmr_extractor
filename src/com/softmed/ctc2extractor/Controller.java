@@ -50,7 +50,7 @@ public class Controller implements Initializable {
     private static String regcode = "", discode = "", facility = "", healthcentre = "", centrecode = "", hfrCode = "";
     private static Date todaysDate;
 
-    public Label facilityName;
+    public Label DatabaseNameLabel;
     public Label HFRCode;
     public TextArea log;
     public JFXDatePicker startDatePicker;
@@ -113,7 +113,7 @@ public class Controller implements Initializable {
                 e.printStackTrace();
             }
 
-            String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+            String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
             try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
                 getFacilityConfig(stmt);
             } catch (Exception e) {
@@ -130,7 +130,7 @@ public class Controller implements Initializable {
             username = "Please set username the Computer in settings";
         }
 
-        facilityName.setText("CTC2 File Location : " + username);
+        DatabaseNameLabel.setText("CTC2 File Location : " + username);
 
         final JLabel label4 = new JLabel();
         if (hfrCode.equals("")) {
@@ -216,7 +216,7 @@ public class Controller implements Initializable {
 
         try {
             rsConfig = stmt.executeQuery(SqlConfig);
-            rsConfig.first();
+            rsConfig.next();
 
             regcode = rsConfig.getString("RegionCode");
             discode = rsConfig.getString("DistrictCode");
@@ -274,7 +274,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
-        String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
         try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
             getFacilityConfig(stmt);
         } catch (Exception e) {
@@ -282,7 +282,7 @@ public class Controller implements Initializable {
         }
 
 
-        facilityName.setText("File Location :" + username);
+        DatabaseNameLabel.setText("File Location :" + username);
 
         HFRCode.setText("Facility HFR Code  :  " + hfrCode);
     }
@@ -310,7 +310,7 @@ public class Controller implements Initializable {
         final java.util.List<CTCPatient> ctcMissedAppointmentsPatients = new ArrayList<>();
         System.out.println("Patients Information");
 
-        String connectionUrl = "jdbc:sqlserver://192.168.1.110:1433\\CTC2NSTANCE;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
         try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
             String SQL = "SELECT  * FROM dbo.tblPatients";
             ResultSet rsPatient = stmt.executeQuery(SQL);
@@ -354,7 +354,7 @@ public class Controller implements Initializable {
 
                 String SqlLastAppointment = "SELECT TOP(1) * FROM dbo.tblAppointments WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY DateAppointmentGiven DESC";
                 ResultSet rsAppointment = stmt.executeQuery(SqlLastAppointment);
-                rsAppointment.first();
+                rsAppointment.next();
 
                 //Calculating the date of the last 28 days from now
                 Date _28DaysAgo = new Date();
@@ -433,7 +433,7 @@ public class Controller implements Initializable {
 
                     String SqlStatus = "SELECT TOP(1) * FROM dbo.tblStatus WHERE PatientID='" + ctcPatient.getCtcNumber() + "' ORDER BY StatusDate DESC";
                     ResultSet rsStatus = stmt.executeQuery(SqlStatus);
-                    rsStatus.first();
+                    rsStatus.next();
 
 
                     if (!rsStatus.getString("Status").toLowerCase().contains("transferred") && !rsStatus.getString("Status").toLowerCase().contains("died") && !rsStatus.getString("Status").toLowerCase().contains("opted")) {
@@ -495,7 +495,7 @@ public class Controller implements Initializable {
         ResultSet rsVisit = null;
         try {
             rsVisit = stmt.executeQuery(SqlLastVisit);
-            rsVisit.first();
+            rsVisit.next();
             Date visitDate = rsVisit.getDate("VisitDate");
             Calendar c = Calendar.getInstance();
             c.setTime(appointment.getDate("DateAppointmentGiven"));
@@ -536,7 +536,7 @@ public class Controller implements Initializable {
 
             try {
                 rsPregnancy = stmt.executeQuery(SqlLastPregnancy);
-                rsPregnancy.first();
+                rsPregnancy.next();
 
                 Date dateOfBirth = rsPregnancy.getDate("DateOfBirth");
                 if (dateOfBirth == null && rsPregnancy.getDate("DueDate").after(todaysDate)) {

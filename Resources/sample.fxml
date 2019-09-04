@@ -67,7 +67,7 @@
                <font>
                   <Font name="Apple SD GothicNeo ExtraBold" size="24.0" />
                </font></Label>
-            <Label fx:id="facilityName" prefHeight="17.0" prefWidth="440.0" text="Facility Name" GridPane.columnSpan="5" GridPane.rowIndex="2" />
+            <Label fx:id="DatabaseNameLabel" prefHeight="17.0" prefWidth="440.0" text="Database Name" GridPane.columnSpan="5" GridPane.rowIndex="2" />
             <Label GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Label fx:id="HFRCode" alignment="CENTER" contentDisplay="CENTER" text="Facility HFR Code" textAlignment="CENTER" GridPane.columnSpan="4" GridPane.rowIndex="1">
                <font>
