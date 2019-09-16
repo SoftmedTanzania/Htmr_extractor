@@ -10,10 +10,17 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -100,12 +107,7 @@ public class Controller implements Initializable {
         try {
             username = configuration.getString(TAG_SQLSERVER_USERNAME);
             password = configuration.getString(TAG_SQLSERVER_PASSWORD);
-            dbName = configuration.getString(TAG_SQLSERVER_USERNAME);
-
-
-            dbName = "CTC2data107872_4";
-            username = "extractor";
-            password = "123";
+            dbName = configuration.getString(TAG_SQLSERVER_DB);
 
             try {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -113,7 +115,7 @@ public class Controller implements Initializable {
                 e.printStackTrace();
             }
 
-            String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+            String connectionUrl = "jdbc:sqlserver://127.0.0.1\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
             try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
                 getFacilityConfig(stmt);
             } catch (Exception e) {
@@ -130,7 +132,7 @@ public class Controller implements Initializable {
             username = "Please set username the Computer in settings";
         }
 
-        DatabaseNameLabel.setText("Database Name : " + dbName);
+        DatabaseNameLabel.setText("Database Name : " + (dbName==null?"":dbName));
 
         final JLabel label4 = new JLabel();
         if (hfrCode.equals("")) {
@@ -244,29 +246,87 @@ public class Controller implements Initializable {
 
     public void setLocation() {
         // Button pressed logic goes here
+        // Create the custom dialog.
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle("Login Dialog");
+        dialog.setHeaderText("Look, a Custom Login Dialog");
 
-        FileChooser fileChooser = new FileChooser();
+// Set the icon (must be included in the project).
+//        dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
 
-        Stage primaryStage = new Stage();
-        primaryStage.setTitle("Pick CTC2 DB Location");
+// Set the button types.
+        ButtonType loginButtonType = new ButtonType("Login", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+// Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new  javafx.geometry.Insets(20, 150, 10, 10));
 
-        System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+        final TextField usernameTextField = new TextField();
+        usernameTextField.setPromptText("Username");
 
-        try {
-            createDefault(configurationFile, selectedFile.getAbsolutePath(), "", "");
-        } catch (Exception e1) {
-            e1.printStackTrace();
 
-            log.appendText("\n\nError Encountered : " + e1.getMessage());
-        }
+
+        final TextField dbNameTextField = new TextField();
+        dbNameTextField.setPromptText("Database Name");
+
+        final PasswordField passwordTextField = new PasswordField();
+        passwordTextField.setPromptText("Password");
+
+        grid.add(new Label("Database Name:"), 0, 0);
+        grid.add(dbNameTextField, 1, 0);
+
+        grid.add(new Label("Username:"), 0, 1);
+        grid.add(usernameTextField, 1, 1);
+
+        grid.add(new Label("Password:"), 0, 2);
+        grid.add(passwordTextField, 1, 2);
+
+// Enable/Disable login button depending on whether a username was entered.
+        Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+        loginButton.setDisable(true);
+
+// Do some validation (using the Java 8 lambda syntax).
+        usernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            loginButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        dialog.getDialogPane().setContent(grid);
+
+// Request focus on the username field by default.
+        Platform.runLater(() -> usernameTextField.requestFocus());
+
+// Convert the result to a username-password-pair when the login button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+
+                List<String> data = new ArrayList<>();
+                data.add(dbNameTextField.getText());
+                data.add(usernameTextField.getText());
+                data.add(passwordTextField.getText());
+
+                return data;
+            }
+            return null;
+        });
+
+        Optional<List<String>> result = dialog.showAndWait();
+
+        result.ifPresent(usernamePassword -> {
+            System.out.println("Database Name=" + result.get().get(0)+", Username=" + result.get().get(1) + ", Password=" + result.get().get(2));
+
+            try {
+                createDefault(configurationFile, result.get().get(1), result.get().get(2),  result.get().get(0));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+
+                log.appendText("\n\nError Encountered : " + e1.getMessage());
+            }
+        });
+
         loadFirst(configurationFile);
-
-
-        dbName = "CTC2data107872_4";
-        username = "extractor";
-        password = "123";
 
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -281,8 +341,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
-
-        DatabaseNameLabel.setText("File Location :" + username);
+        DatabaseNameLabel.setText("Database Name : " + (dbNameTextField.getText()==null?"":dbName));
 
         HFRCode.setText("Facility HFR Code  :  " + hfrCode);
     }
