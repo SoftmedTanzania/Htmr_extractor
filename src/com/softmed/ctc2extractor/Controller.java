@@ -79,6 +79,11 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initializeData();
+    }
+
+    public void initializeData() {
+        log.setText("");
         Configuration configuration = null;
         try {
             configuration = loadFirst(configurationFile);
@@ -116,6 +121,7 @@ public class Controller implements Initializable {
                 getFacilityConfig(stmt);
             } catch (Exception e) {
                 e.printStackTrace();
+                log.appendText("Error : connection failed");
             }
 
 
@@ -161,8 +167,6 @@ public class Controller implements Initializable {
                 System.out.println("End Date = " + endDate.toString());
             }
         });
-
-
     }
 
     public void ExportToExcel() {
@@ -314,31 +318,12 @@ public class Controller implements Initializable {
 
             try {
                 createDefault(configurationFile, result.get().get(1), result.get().get(2), result.get().get(0));
+                initializeData();
             } catch (Exception e1) {
                 e1.printStackTrace();
-
                 log.appendText("\n\nError Encountered : " + e1.getMessage());
             }
         });
-
-        loadFirst(configurationFile);
-
-        try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        String connectionUrl = "jdbc:sqlserver://127.0.0.1\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
-        try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
-            getFacilityConfig(stmt);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        DatabaseNameLabel.setText("Database Name : " + (dbNameTextField.getText() == null ? "" : dbName));
-
-        HFRCode.setText("Facility HFR Code  :  " + hfrCode);
     }
 
 
