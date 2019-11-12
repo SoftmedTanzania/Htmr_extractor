@@ -11,16 +11,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.util.Pair;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -132,7 +128,7 @@ public class Controller implements Initializable {
             username = "Please set username the Computer in settings";
         }
 
-        DatabaseNameLabel.setText("Database Name : " + (dbName==null?"":dbName));
+        DatabaseNameLabel.setText("Database Name : " + (dbName == null ? "" : dbName));
 
         final JLabel label4 = new JLabel();
         if (hfrCode.equals("")) {
@@ -262,11 +258,10 @@ public class Controller implements Initializable {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new  javafx.geometry.Insets(20, 150, 10, 10));
+        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
 
         final TextField usernameTextField = new TextField();
         usernameTextField.setPromptText("Username");
-
 
 
         final TextField dbNameTextField = new TextField();
@@ -315,10 +310,10 @@ public class Controller implements Initializable {
         Optional<List<String>> result = dialog.showAndWait();
 
         result.ifPresent(usernamePassword -> {
-            System.out.println("Database Name=" + result.get().get(0)+", Username=" + result.get().get(1) + ", Password=" + result.get().get(2));
+            System.out.println("Database Name=" + result.get().get(0) + ", Username=" + result.get().get(1) + ", Password=" + result.get().get(2));
 
             try {
-                createDefault(configurationFile, result.get().get(1), result.get().get(2),  result.get().get(0));
+                createDefault(configurationFile, result.get().get(1), result.get().get(2), result.get().get(0));
             } catch (Exception e1) {
                 e1.printStackTrace();
 
@@ -341,7 +336,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
-        DatabaseNameLabel.setText("Database Name : " + (dbNameTextField.getText()==null?"":dbName));
+        DatabaseNameLabel.setText("Database Name : " + (dbNameTextField.getText() == null ? "" : dbName));
 
         HFRCode.setText("Facility HFR Code  :  " + hfrCode);
     }
@@ -409,7 +404,6 @@ public class Controller implements Initializable {
                 List<PatientAppointment> ltfAppointments = new ArrayList<PatientAppointment>();
                 int missedAppointmentCount = 0;
                 int ltfAppointmentCount = 0;
-
 
 
                 Statement stmtAppointment = con.createStatement();
