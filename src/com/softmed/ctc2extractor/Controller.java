@@ -334,7 +334,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
-        String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        String connectionUrl = "jdbc:sqlserver://127.0.0.1\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
         try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
             getFacilityConfig(stmt);
         } catch (Exception e) {
@@ -369,7 +369,7 @@ public class Controller implements Initializable {
         final java.util.List<CTCPatient> ctcMissedAppointmentsPatients = new ArrayList<>();
         System.out.println("Patients Information");
 
-        String connectionUrl = "jdbc:sqlserver://192.168.1.110\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
+        String connectionUrl = "jdbc:sqlserver://127.0.0.1\\CTC2NSTANCE:1433;databaseName=" + dbName + ";user=" + username + ";password=" + password;
         try (Connection con = DriverManager.getConnection(connectionUrl); Statement stmt = con.createStatement();) {
             String SQL = "SELECT  * FROM dbo.tblPatients";
             ResultSet rsPatient = stmt.executeQuery(SQL);
