@@ -533,6 +533,8 @@ public class Controller implements Initializable {
             if (aDate.after(startDate) && aDate.before(endDate)) {
                 missedAndLTFAppointmentsPatients.add(ctcPatient);
             }
+            if(i==10)
+                break;
 
         }
 
