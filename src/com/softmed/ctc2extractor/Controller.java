@@ -505,7 +505,36 @@ public class Controller implements Initializable {
 
         java.util.List<CTCPatient> missedAndLTFAppointmentsPatients = new ArrayList<>();
         missedAndLTFAppointmentsPatients.addAll(ctcMissedAppointmentsPatients);
-        missedAndLTFAppointmentsPatients.addAll(ctcLTFPatients);
+
+
+
+        Calendar c1 = Calendar.getInstance();
+        try {
+            c1.setTimeInMillis(startDate.getTime());
+            c1.add(Calendar.DATE, -28);
+        } catch (Exception e) {
+            e.printStackTrace();
+            c1.add(Calendar.YEAR, -1);
+        }
+        startDate = c1.getTime();
+
+        Calendar c2 = Calendar.getInstance();
+        try {
+            c2.setTimeInMillis(endDate.getTime());
+            c2.add(Calendar.DATE, -28);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        endDate = c2.getTime();
+
+        for (int i = 0; i < ctcLTFPatients.size(); i++) {
+            CTCPatient ctcPatient = ctcLTFPatients.get(i);
+            Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
+            if (aDate.after(startDate) && aDate.before(endDate)) {
+                missedAndLTFAppointmentsPatients.add(ctcPatient);
+            }
+
+        }
 
         ctcPatientsModel.setCtcPatientsDTOS(missedAndLTFAppointmentsPatients);
 
@@ -593,13 +622,13 @@ public class Controller implements Initializable {
 
         System.out.println("Data = "+json);
         HttpClient httpClient = new DefaultHttpClient();
-        String username = "username";
-        String password = "password";
+        String username = "testuser";
+        String password = "Boresha123";
 
         byte[] encodedPassword = (username + ":" + password).getBytes();
 
         try {
-            HttpPost request = new HttpPost("http://139.162.184.148:8080/opensrp/save-ctc-patients");
+            HttpPost request = new HttpPost("http://45.56.90.103:8080/opensrp/save-ctc-patients");
             StringEntity params = new StringEntity(json);
             request.addHeader("content-type", "application/json");
             request.addHeader("Accept", "application/json");
