@@ -15,7 +15,7 @@ public class Constants {
     /** These are testing server chw user and teams ids used to tie the clients to the specific chw and facility.
      *  These are temporarily hardcoded here for testing purposes for now
      *  but later will be refactored to a better implementation for obtaining them from opensrp server
-     *  Please DO NOT UPDATE THESE for now while testing, or else the event and clients wont be tied to the chw
+     *  Please DO NOT UPDATE THESE for now while testing, or else the event and clients wont be tied to the chw, nor facility
      *  unless you have the correct values from the server.
      */
     public static final String locationID = "7504f24d-6b6f-4a7c-a8a2-60ab491678a6";
