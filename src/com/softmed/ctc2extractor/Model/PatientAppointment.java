@@ -1,35 +1,35 @@
 package com.softmed.ctc2extractor.Model;
 
 public class PatientAppointment {
-	private Long dateOfAppointment;
-	private int appointmentType;
+    private Long dateOfAppointment;
+    private int appointmentType;
 
-	//status of 2 = LTF
-	//status of 3 = missed Appointment
+    //status of 2 = LTF
+    //status of 3 = missed Appointment
 
-	private int status;
+    private int status;
 
-	public Long getDateOfAppointment() {
-		return dateOfAppointment;
-	}
+    public Long getDateOfAppointment() {
+        return dateOfAppointment;
+    }
 
-	public void setDateOfAppointment(Long dateOfAppointment) {
-		this.dateOfAppointment = dateOfAppointment;
-	}
+    public void setDateOfAppointment(Long dateOfAppointment) {
+        this.dateOfAppointment = dateOfAppointment;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	public int getAppointmentType() {
-		return appointmentType;
-	}
+    public int getAppointmentType() {
+        return appointmentType;
+    }
 
-	public void setAppointmentType(int appointmentType) {
-		this.appointmentType = appointmentType;
-	}
+    public void setAppointmentType(int appointmentType) {
+        this.appointmentType = appointmentType;
+    }
 }
