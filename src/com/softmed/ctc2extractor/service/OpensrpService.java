@@ -56,20 +56,30 @@ public class OpensrpService {
         familyClient.setId(UUID.randomUUID().toString());
         familyClient.setDateCreated(new Date());
         familyClient.setAttributes(new HashMap<>());
-        setAddress(familyClient, patient.getVillage());
+        setAddress(familyClient, patient.getVillage(), patient.getWard());
 
 
         return familyClient;
     }
 
-    public static void setAddress(Client client, String village) {
+    public static void setAddress(Client client, String village, String ward) {
         List<Address> addresses = new ArrayList<>();
-        Address villageAddress = new Address();
-        villageAddress.setAddressType("village");
-        villageAddress.setCityVillage(village);
-        villageAddress.setAddressFields(new HashMap<>());
 
-        addresses.add(villageAddress);
+        if (!village.isEmpty()) {
+            Address villageAddress = new Address();
+            villageAddress.setAddressType("village");
+            villageAddress.setCityVillage(village);
+            villageAddress.setAddressFields(new HashMap<>());
+            addresses.add(villageAddress);
+        }
+
+        if (!ward.isEmpty()) {
+            Address wardAddress = new Address();
+            wardAddress.setAddressType("ward");
+            wardAddress.setCityVillage(ward);
+            wardAddress.setAddressFields(new HashMap<>());
+            addresses.add(wardAddress);
+        }
 
         client.setAddresses(addresses);
     }
@@ -101,8 +111,7 @@ public class OpensrpService {
         attributes.put("Health_Insurance_Type", "None");
 
         ctcClient.setAttributes(attributes);
-        setAddress(ctcClient, patient.getVillage());
-
+        setAddress(ctcClient, patient.getVillage(), patient.getWard());
         return ctcClient;
     }
 
