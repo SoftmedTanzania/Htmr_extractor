@@ -65,7 +65,7 @@ public class OpensrpService {
     public static void setAddress(Client client, String village, String ward) {
         List<Address> addresses = new ArrayList<>();
 
-        if (!village.isEmpty()) {
+        if (village != null && !village.isEmpty()) {
             Address villageAddress = new Address();
             villageAddress.setAddressType("village");
             villageAddress.setCityVillage(village);
@@ -73,7 +73,7 @@ public class OpensrpService {
             addresses.add(villageAddress);
         }
 
-        if (!ward.isEmpty()) {
+        if (ward != null && !ward.isEmpty()) {
             Address wardAddress = new Address();
             wardAddress.setAddressType("ward");
             wardAddress.setCityVillage(ward);
@@ -119,7 +119,7 @@ public class OpensrpService {
         Event familyRegistrationEvent = new Event();
         familyRegistrationEvent.setBaseEntityId(client.getBaseEntityId());
         familyRegistrationEvent.setEventType("Family Registration");
-        familyRegistrationEvent.setEntityType("ec_family");
+        familyRegistrationEvent.setEntityType("ec_independent_client");
         setMetaData(familyRegistrationEvent);
         familyRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "last_interacted_with", "", Arrays.asList(new Object[]{String.valueOf(Calendar.getInstance().getTimeInMillis())}), null, null, "last_interacted_with"));
         familyRegistrationEvent.addObs(new Obs("concept", "phonenumber", "163152AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "", Arrays.asList(new Object[]{patient.getPhoneNumber()}), null, null, "phonenumber"));
@@ -139,7 +139,7 @@ public class OpensrpService {
         familyMemberRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "last_interacted_with", "", Arrays.asList(new Object[]{String.valueOf(Calendar.getInstance().getTimeInMillis())}), null, null, "last_interacted_with"));
         familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "", "", Arrays.asList(new Object[]{client.getLastName()}), null, null, "surname"));
 
-        if (!patient.getCareTakerName().isEmpty()) {
+        if (patient.getCareTakerName() != null && !patient.getCareTakerName().isEmpty()) {
             familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "Has_Primary_Caregiver", "", Arrays.asList(new Object[]{"Yes"}), Arrays.asList(new Object[]{"Yes"}), null, "has_primary_caregiver"));
             familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "Primary_Caregiver_Name", "", Arrays.asList(new Object[]{patient.getCareTakerName()}), null, null, "primary_caregiver_name"));
             familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "159635AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", Arrays.asList(new Object[]{patient.getCareTakerPhoneNumber()}), null, null, "other_phone_number"));
