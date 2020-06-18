@@ -1,4 +1,4 @@
-package com.softmed.ctc2extractor.Model;
+package com.softmed.ctc2extractor.model;
 
 public class PatientAppointment {
     private Long dateOfAppointment;

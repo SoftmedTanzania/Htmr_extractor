@@ -1,7 +1,7 @@
 package com.softmed.ctc2extractor.service;
 
-import com.softmed.ctc2extractor.Model.CTCPatient;
-import com.softmed.ctc2extractor.util.Util;
+import com.softmed.ctc2extractor.model.CTCPatient;
+import com.softmed.ctc2extractor.util.Utils;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import org.apache.poi.ss.usermodel.Cell;
@@ -21,7 +21,8 @@ import java.util.TreeMap;
 
 public class ExcelService {
     public TextArea log;
-    private Date startDate, endDate;
+    private Date startDate;
+    private Date endDate;
 
     public ExcelService(TextArea log, Date startDate, Date endDate) {
         this.log = log;
@@ -37,8 +38,8 @@ public class ExcelService {
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        createSheet(workbook, Util.getLTFBasedOnDateRange(ltfsCTCPatients, true, startDate, endDate), "Extracted LTFs", true);
-        createSheet(workbook, Util.getLTFBasedOnDateRange(missedAppointmentsCTCPatients, false, startDate, endDate), "Patients with Missed Appointments", true);
+        createSheet(workbook, Utils.getLTFBasedOnDateRange(ltfsCTCPatients, true, startDate, endDate), "Extracted LTFs", true);
+        createSheet(workbook, Utils.getLTFBasedOnDateRange(missedAppointmentsCTCPatients, false, startDate, endDate), "Patients with Missed Appointments", true);
 
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");

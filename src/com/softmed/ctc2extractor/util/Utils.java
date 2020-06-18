@@ -1,13 +1,13 @@
 package com.softmed.ctc2extractor.util;
 
-import com.softmed.ctc2extractor.Model.CTCPatient;
+import com.softmed.ctc2extractor.model.CTCPatient;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class Util {
+public class Utils {
     public static List<CTCPatient> getLTFBasedOnDateRange(List<CTCPatient> patients, boolean isLTF, Date startDate, Date endDate) {
         List<CTCPatient> obtainedPatients = new ArrayList<>();
         Calendar c1 = Calendar.getInstance();

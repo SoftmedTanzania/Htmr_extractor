@@ -1,4 +1,4 @@
-package com.softmed.ctc2extractor.Model;
+package com.softmed.ctc2extractor.model;
 
 import java.util.List;
 

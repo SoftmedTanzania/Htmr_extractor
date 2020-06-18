@@ -1,11 +1,11 @@
-package com.softmed.ctc2extractor.Model;
+package com.softmed.ctc2extractor.model;
 
 import java.util.List;
 
 public class ClientEvents {
-    List<Client> clients;
-    List<Event> events;
-    int no_of_events;
+    private List<Client> clients;
+    private List<Event> events;
+    private int no_of_events;
 
     public List<Client> getClients() {
         return clients;
@@ -23,11 +23,11 @@ public class ClientEvents {
         this.events = events;
     }
 
-    public int getNo_of_events() {
+    public int getNoOfEvents() {
         return no_of_events;
     }
 
-    public void setNo_of_events(int no_of_events) {
+    public void setNoOfEvents(int no_of_events) {
         this.no_of_events = no_of_events;
     }
 }

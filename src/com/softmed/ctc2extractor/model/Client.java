@@ -1,4 +1,4 @@
-package com.softmed.ctc2extractor.Model;
+package com.softmed.ctc2extractor.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

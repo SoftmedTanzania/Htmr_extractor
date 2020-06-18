@@ -1,4 +1,4 @@
-package com.softmed.ctc2extractor.Model;
+package com.softmed.ctc2extractor.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -23,9 +23,6 @@ public abstract class BaseDataObject extends MotechBaseDataObject {
     private Integer clientDatabaseVersion;
     @JsonProperty
     private String clientApplicationVersionName;
-
-    public BaseDataObject() {
-    }
 
     public Date getDateCreated() {
         return dateCreated;

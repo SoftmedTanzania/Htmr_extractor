@@ -9,11 +9,11 @@ import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
-import com.softmed.ctc2extractor.Model.CTCPatient;
-import com.softmed.ctc2extractor.Model.CTCPatientsModel;
-import com.softmed.ctc2extractor.Model.PatientAppointment;
+import com.softmed.ctc2extractor.model.CTCPatient;
+import com.softmed.ctc2extractor.model.CTCPatientsModel;
+import com.softmed.ctc2extractor.model.PatientAppointment;
 import com.softmed.ctc2extractor.service.ExcelService;
-import com.softmed.ctc2extractor.util.Util;
+import com.softmed.ctc2extractor.util.Utils;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -45,7 +45,7 @@ import java.util.ResourceBundle;
 import static com.softmed.ctc2extractor.Constants.BASE_SERVER_URL;
 import static com.softmed.ctc2extractor.Constants.PASSWORD;
 import static com.softmed.ctc2extractor.Constants.USERNAME;
-import static com.softmed.ctc2extractor.service.OpensrpService.generateClientEvent;
+import static com.softmed.ctc2extractor.service.OpenSrpService.generateClientEvent;
 
 public class Controller implements Initializable {
     private static final String TAG_CTC2_FILE_LOCAITON = "CTC2FileLocation";
@@ -513,8 +513,8 @@ public class Controller implements Initializable {
         }
 
         java.util.List<CTCPatient> missedAndLTFAppointmentsPatients = new ArrayList<>();
-        missedAndLTFAppointmentsPatients.addAll(Util.getLTFBasedOnDateRange(ctcMissedAppointmentsPatients, false, startDate, endDate));
-        missedAndLTFAppointmentsPatients.addAll(Util.getLTFBasedOnDateRange(ctcLTFPatients, true, startDate, endDate));
+        missedAndLTFAppointmentsPatients.addAll(Utils.getLTFBasedOnDateRange(ctcMissedAppointmentsPatients, false, startDate, endDate));
+        missedAndLTFAppointmentsPatients.addAll(Utils.getLTFBasedOnDateRange(ctcLTFPatients, true, startDate, endDate));
 
         ctcPatientsModel.setCtcPatientsDTOS(missedAndLTFAppointmentsPatients);
         System.out.println("Patients found = " + missedAndLTFAppointmentsPatients.size());

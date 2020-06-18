@@ -2,14 +2,14 @@ package com.softmed.ctc2extractor.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.softmed.ctc2extractor.Model.Address;
-import com.softmed.ctc2extractor.Model.CTCPatient;
-import com.softmed.ctc2extractor.Model.CTCPatientsModel;
-import com.softmed.ctc2extractor.Model.Client;
-import com.softmed.ctc2extractor.Model.ClientEvents;
-import com.softmed.ctc2extractor.Model.Event;
-import com.softmed.ctc2extractor.Model.Obs;
-import com.softmed.ctc2extractor.Model.PatientAppointment;
+import com.softmed.ctc2extractor.model.Address;
+import com.softmed.ctc2extractor.model.CTCPatient;
+import com.softmed.ctc2extractor.model.CTCPatientsModel;
+import com.softmed.ctc2extractor.model.Client;
+import com.softmed.ctc2extractor.model.ClientEvents;
+import com.softmed.ctc2extractor.model.Event;
+import com.softmed.ctc2extractor.model.Obs;
+import com.softmed.ctc2extractor.model.PatientAppointment;
 import com.softmed.ctc2extractor.util.DateTimeTypeConverter;
 import org.joda.time.DateTime;
 
@@ -28,7 +28,7 @@ import static com.softmed.ctc2extractor.Constants.providerId;
 import static com.softmed.ctc2extractor.Constants.team;
 import static com.softmed.ctc2extractor.Constants.teamId;
 
-public class OpensrpService {
+public class OpenSrpService {
 
     private static final int clientDatabaseVersion = 17;
     private static final int clientApplicationVersion = 2;
@@ -173,8 +173,8 @@ public class OpensrpService {
         event.setFormSubmissionId(UUID.randomUUID().toString());
         event.setEventDate(new Date());
         event.setDateCreated(new Date());
-        event.addObs(OpensrpService.getStartOb());
-        event.addObs(OpensrpService.getEndOb());
+        event.addObs(OpenSrpService.getStartOb());
+        event.addObs(OpenSrpService.getEndOb());
         event.setClientApplicationVersion(clientApplicationVersion);
         event.setClientDatabaseVersion(clientDatabaseVersion);
         event.setDuration(0);
@@ -222,7 +222,7 @@ public class OpensrpService {
         ClientEvents clientEvents = new ClientEvents();
         clientEvents.setClients(clients);
         clientEvents.setEvents(events);
-        clientEvents.setNo_of_events(events.size());
+        clientEvents.setNoOfEvents(events.size());
 
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter()).create();
