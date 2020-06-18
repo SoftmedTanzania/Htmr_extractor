@@ -122,13 +122,21 @@ public class OpensrpService {
         Event familyMemberRegistrationEvent = new Event();
         familyMemberRegistrationEvent.setBaseEntityId(client.getBaseEntityId());
         familyMemberRegistrationEvent.setEventType("Family Member Registration");
-        familyMemberRegistrationEvent.setEntityType("ec_family_member");
+        familyMemberRegistrationEvent.setEntityType("ec_independent_client");
         familyMemberRegistrationEvent.addObs(new Obs("concept", "phonenumber", "163152AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "", Arrays.asList(new Object[]{patient.getPhoneNumber()}), null, null, "phonenumber"));
         familyMemberRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "1542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", Arrays.asList(new Object[]{"164369AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}), Arrays.asList(new Object[]{"None"}), null, "service_provider"));
         familyMemberRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "id_avail", "", Arrays.asList(new Object[]{"None"}), null, null, "id_avail"));
         familyMemberRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "leader", "", Arrays.asList(new Object[]{"None"}), null, null, "leader"));
         familyMemberRegistrationEvent.addObs(new Obs("formsubmissionField", "text", "last_interacted_with", "", Arrays.asList(new Object[]{String.valueOf(Calendar.getInstance().getTimeInMillis())}), null, null, "last_interacted_with"));
         familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "", "", Arrays.asList(new Object[]{client.getLastName()}), null, null, "surname"));
+
+        if (!patient.getCareTakerName().isEmpty()) {
+            familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "Has_Primary_Caregiver", "", Arrays.asList(new Object[]{"Yes"}), Arrays.asList(new Object[]{"Yes"}), null, "has_primary_caregiver"));
+            familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "Primary_Caregiver_Name", "", Arrays.asList(new Object[]{patient.getCareTakerName()}), null, null, "primary_caregiver_name"));
+            familyMemberRegistrationEvent.addObs(new Obs("concept", "text", "5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "159635AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", Arrays.asList(new Object[]{patient.getCareTakerPhoneNumber()}), null, null, "other_phone_number"));
+        }
+
+
         setMetaData(familyMemberRegistrationEvent);
         return familyMemberRegistrationEvent;
     }
