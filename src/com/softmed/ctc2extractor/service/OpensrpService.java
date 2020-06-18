@@ -13,7 +13,6 @@ import com.softmed.ctc2extractor.Model.PatientAppointment;
 import com.softmed.ctc2extractor.util.DateTimeTypeConverter;
 import org.joda.time.DateTime;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -24,20 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.softmed.ctc2extractor.Constants.locationID;
+import static com.softmed.ctc2extractor.Constants.providerId;
+import static com.softmed.ctc2extractor.Constants.team;
+import static com.softmed.ctc2extractor.Constants.teamId;
+
 public class OpensrpService {
-
-    //These are testing server chw user credentials.
-    //these are temporarily hardcoded here for now but later will be refactored to be obtained from the opensrp server during authentication
-    private static final String locationID = "7504f24d-6b6f-4a7c-a8a2-60ab491678a6";
-    private static final String providerId = "johnjamesdoe";
-    private static final String teamId = "7d69862f-dde4-4ca0-bc24-27aff12e253a";
-    private static final String team = "Masana Teams";
-
 
     private static final int clientDatabaseVersion = 17;
     private static final int clientApplicationVersion = 2;
-
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     private static Obs getStartOb() {
         return new Obs("concept", "start", "163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "", Arrays.asList(new Object[]{new Date()}), null, null, "start");
@@ -155,9 +149,9 @@ public class OpensrpService {
 
     private static void setMetaData(Event event) {
         event.setLocationId(locationID);
-        event.setProviderId(providerId); //TODO extract this
-        event.setTeamId(teamId); //TODO extract this
-        event.setTeam(team); //TODO extract this
+        event.setProviderId(providerId);
+        event.setTeamId(teamId);
+        event.setTeam(team);
         event.setType("Event");
         event.setFormSubmissionId(UUID.randomUUID().toString());
         event.setEventDate(new Date());
@@ -176,12 +170,7 @@ public class OpensrpService {
         List<Client> clients = new ArrayList<>();
         List<Event> events = new ArrayList<>();
 
-        int i = 0;
         for (CTCPatient patient : ctcPatientsModel.getCtcPatientsDTOS()) {
-            if (i == 5)
-                break;
-
-            i++;
             Client familyClient = getClientEvent(patient);
             Client ctcClient = getFamilyHeadClientEvent(patient);
 

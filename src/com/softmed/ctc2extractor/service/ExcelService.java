@@ -1,6 +1,7 @@
 package com.softmed.ctc2extractor.service;
 
 import com.softmed.ctc2extractor.Model.CTCPatient;
+import com.softmed.ctc2extractor.util.Util;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,9 +37,8 @@ public class ExcelService {
         //Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
-        createSheet(workbook, ltfsCTCPatients, "Extracted LTFs", true);
-        createSheet(workbook, missedAppointmentsCTCPatients, "Patients with Missed Appointments", false);
-
+        createSheet(workbook, Util.getLTFBasedOnDateRange(ltfsCTCPatients, true, startDate, endDate), "Extracted LTFs", true);
+        createSheet(workbook, Util.getLTFBasedOnDateRange(missedAppointmentsCTCPatients, false, startDate, endDate), "Patients with Missed Appointments", true);
 
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
@@ -58,7 +58,6 @@ public class ExcelService {
     }
 
     private void createSheet(XSSFWorkbook workbook, List<CTCPatient> patients, String sheetName, boolean isLTF) {
-
         //Create a blank missed appointments sheet
         XSSFSheet missedAppointmentsSheet = workbook.createSheet(sheetName);
 
@@ -66,40 +65,9 @@ public class ExcelService {
         Map<String, Object[]> data = new TreeMap<>();
         data.put("1", new Object[]{"CTC-NUMBER", "NAME", "GENDER", "PHONE NUMBER", "VILLAGE", "WARD", "CARE TAKER NAME", "CARE TAKER PHONE NUMBER", "APPOINTMENT DATE"});
 
-        Calendar c1 = Calendar.getInstance();
-        try {
-            c1.setTimeInMillis(startDate.getTime());
-            c1.add(Calendar.DATE, -28);
-        } catch (Exception e) {
-            e.printStackTrace();
-            c1.add(Calendar.YEAR, -1);
-        }
-        Date mStartDate = c1.getTime();
-
-        Calendar c2 = Calendar.getInstance();
-        try {
-            c2.setTimeInMillis(endDate.getTime());
-            c2.add(Calendar.DATE, -28);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Date mEndDate = c2.getTime();
-
         for (int i = 0; i < patients.size(); i++) {
             CTCPatient ctcPatient = patients.get(i);
-            if (isLTF) {
-                Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
-                if (aDate.after(mStartDate) && aDate.before(mEndDate)) {
-                    saveData(ctcPatient, i, data);
-                }
-            } else {
-                Date aDate = new Date(ctcPatient.getPatientAppointments().get(0).getDateOfAppointment());
-                if (aDate.after(startDate) && aDate.before(endDate)) {
-                    saveData(ctcPatient, i, data);
-                }
-            }
-
+            saveData(ctcPatient, i, data);
         }
 
         String summaryMessage;
