@@ -23,10 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.softmed.ctc2extractor.Constants.locationID;
-import static com.softmed.ctc2extractor.Constants.providerId;
-import static com.softmed.ctc2extractor.Constants.team;
-import static com.softmed.ctc2extractor.Constants.teamId;
+import static com.softmed.ctc2extractor.util.Constants.locationID;
+import static com.softmed.ctc2extractor.util.Constants.providerId;
+import static com.softmed.ctc2extractor.util.Constants.team;
+import static com.softmed.ctc2extractor.util.Constants.teamId;
 
 public class OpenSrpService {
 

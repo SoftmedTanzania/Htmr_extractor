@@ -1,4 +1,4 @@
-package com.softmed.ctc2extractor;
+package com.softmed.ctc2extractor.util;
 
 public class Constants {
     /**

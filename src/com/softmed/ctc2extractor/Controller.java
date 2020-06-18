@@ -42,9 +42,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.softmed.ctc2extractor.Constants.BASE_SERVER_URL;
-import static com.softmed.ctc2extractor.Constants.PASSWORD;
-import static com.softmed.ctc2extractor.Constants.USERNAME;
+import static com.softmed.ctc2extractor.util.Constants.BASE_SERVER_URL;
+import static com.softmed.ctc2extractor.util.Constants.PASSWORD;
+import static com.softmed.ctc2extractor.util.Constants.USERNAME;
 import static com.softmed.ctc2extractor.service.OpenSrpService.generateClientEvent;
 
 public class Controller implements Initializable {
